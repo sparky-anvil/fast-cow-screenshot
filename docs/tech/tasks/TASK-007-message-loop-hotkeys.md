@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Review |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
@@ -220,10 +220,10 @@ internal class WindowsHotkeyService(
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–3 выполнены; контракты — как в разделе 6.
-- [ ] `RegisterHotKey`/`UnregisterHotKey` вызываются только на `fcs-hotkeys`.
-- [ ] 7 тестов проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Шаги 1–3 выполнены; контракты — как в разделе 6.
+- [x] `RegisterHotKey`/`UnregisterHotKey` вызываются только на `fcs-hotkeys`.
+- [x] 7 тестов проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -244,4 +244,4 @@ internal class WindowsHotkeyService(
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-29 | Review | Реализованы HotkeyService, NativeMessageLoop, WindowsHotkeyService и 7 тестов (4 + 3), все пройдены; `gradlew build` - BUILD SUCCESSFUL. По указанию пользователя перед началом TASK-006 и TASK-004 переведены в Done. Отклонений нет. Ручная проверка нажатий - в TASK-015. |
