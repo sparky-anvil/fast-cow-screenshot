@@ -37,7 +37,7 @@
 | [TASK-001](tasks/TASK-001-gradle-project-skeleton.md) | Каркас Gradle-проекта | TDD-001 | — | M | Done |
 | [TASK-002](tasks/TASK-002-domain-geometry.md) | Доменная геометрия и модели | TDD-001 | 001 | M | Done |
 | [TASK-003](tasks/TASK-003-file-names.md) | Имена файлов, `.png`, сокращение пути | TDD-001 | 001 | S | Review |
-| [TASK-004](tasks/TASK-004-settings-model-and-storage.md) | Модель настроек и JSON-хранилище | TDD-001 | 002 | M | Ready |
+| [TASK-004](tasks/TASK-004-settings-model-and-storage.md) | Модель настроек и JSON-хранилище | TDD-001 | 002 | M | Review |
 | [TASK-005](tasks/TASK-005-jna-winapi-mappings.md) | JNA-маппинги WinAPI, DPI, HWND | TDD-001 | 001 | L | Ready |
 | [TASK-006](tasks/TASK-006-monitors-gdi-capture-cursor.md) | Мониторы, GDI-захват, указатель | TDD-001 | 002, 005 | L | Ready |
 | [TASK-007](tasks/TASK-007-message-loop-hotkeys.md) | Цикл сообщений и горячие клавиши | TDD-001 | 004, 005 | M | Ready |
@@ -64,3 +64,5 @@ TASK-002/003/005 и TASK-011/012/013 между собой независимы.
 
 | ID | Вопрос | Задача | Адресат | Блокирует | Статус |
 |---|---|---|---|---|---|
+| [CLR-001](clarifications/CLR-001-mockk-self-attach-jdk25.md) | MockK self-attach на JDK 25: нужен флаг в tasks.test | TASK-004 | Tech | Да | Closed |
+| [CLR-002](clarifications/CLR-002-mockk-agent-cyrillic-path.md) | Self-attach MockK падает из-за кириллицы в пути к Gradle-кэшу | TASK-004 | Tech | Да | Closed |

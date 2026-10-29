@@ -39,6 +39,12 @@ val appJvmArgs = listOf(
 tasks.test {
     useJUnitPlatform()
     jvmArgs(appJvmArgs)
+    // MockK: агент ByteBuddy подключается при старте JVM (-javaagent), а не self-attach,
+    // который на JDK 25 не работает и ломается на путях с кириллицей (CLR-001, CLR-002).
+    doFirst {
+        val agentJar = classpath.first { it.name.startsWith("byte-buddy-agent") }
+        jvmArgs("-javaagent:${agentJar.absolutePath}", "-Xshare:off")
+    }
 }
 
 compose.desktop {

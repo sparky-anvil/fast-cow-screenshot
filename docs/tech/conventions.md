@@ -3,7 +3,7 @@
 | Поле | Значение |
 |---|---|
 | Автор | Tech |
-| Дата последнего изменения | 2026-10-18 |
+| Дата последнего изменения | 2026-10-29 |
 | Связанные ADR | ADR-001, ADR-002, ADR-003 |
 
 > Единый источник правды для Dev. Каждая задача (TASK) предполагает, что исполнитель прочитал этот документ.
@@ -171,6 +171,11 @@ fast-cow-screenshot/
   разрешённое использование `lateinit`.
 - Unit-тестами покрываются: `domain`, `settings`, `storage`, `capture` (с фейками), чистые функции `platform`
   (`DibEncoder`, `HotkeyBinding`).
+- MockK на JDK 25: агент ByteBuddy подключается к тестовой JVM через `-javaagent:<byte-buddy-agent.jar>` и
+  `-Xshare:off` в `doFirst` блока `tasks.test` `build.gradle.kts` (TASK-004, CLR-001, CLR-002). Self-attach
+  (`-Djdk.attach.allowAttachSelf=true`) не использовать: он ломается на путях с кириллицей. В `appJvmArgs` эти
+  флаги не добавлять. Ошибки `Could not self-attach to current VM` или `Error opening zip file` в тестах с MockK
+  означают, что блок `tasks.test` не соответствует TASK-004 шаг 0.
 - Тесты с реальным WinAPI помечаются `@EnabledOnOs(OS.WINDOWS)` и не требуют действий пользователя.
 - Реальный захват на нескольких мониторах, HiDPI, горячие клавиши, трей и вставку из буфера проверяет пользователь
   по шагам раздела «Проверка» задачи.
@@ -199,3 +204,4 @@ fast-cow-screenshot/
 | Дата | Изменение | ADR / TASK |
 |---|---|---|
 | 2026-10-18 | Первая версия | ADR-001, ADR-002, ADR-003 |
+| 2026-10-29 | §9: агент MockK через `-javaagent` в тестовой JVM | CLR-001, CLR-002, TASK-004 |
