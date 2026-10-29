@@ -38,7 +38,7 @@
 | [TASK-002](tasks/TASK-002-domain-geometry.md) | Доменная геометрия и модели | TDD-001 | 001 | M | Done |
 | [TASK-003](tasks/TASK-003-file-names.md) | Имена файлов, `.png`, сокращение пути | TDD-001 | 001 | S | Review |
 | [TASK-004](tasks/TASK-004-settings-model-and-storage.md) | Модель настроек и JSON-хранилище | TDD-001 | 002 | M | Review |
-| [TASK-005](tasks/TASK-005-jna-winapi-mappings.md) | JNA-маппинги WinAPI, DPI, HWND | TDD-001 | 001 | L | Ready |
+| [TASK-005](tasks/TASK-005-jna-winapi-mappings.md) | JNA-маппинги WinAPI, DPI, HWND | TDD-001 | 001 | L | Review |
 | [TASK-006](tasks/TASK-006-monitors-gdi-capture-cursor.md) | Мониторы, GDI-захват, указатель | TDD-001 | 002, 005 | L | Ready |
 | [TASK-007](tasks/TASK-007-message-loop-hotkeys.md) | Цикл сообщений и горячие клавиши | TDD-001 | 004, 005 | M | Ready |
 | [TASK-008](tasks/TASK-008-clipboard-writer.md) | Буфер обмена CF_DIB | TDD-001 | 005, 006, 007 | M | Ready |

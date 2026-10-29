@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Review |
 | Приоритет | Must |
 | Оценка | L (3–6 ч) |
 | Технический дизайн | TDD-001 |
@@ -274,7 +274,7 @@ internal object WindowHandles {
 | `OFN_PATHMUSTEXIST` | `0x800` | | `OFN_EXPLORER` | `0x80000` |
 | `BIF_RETURNONLYFSDIRS` | `0x1` | | `BIF_NEWDIALOGSTYLE` | `0x40` |
 | `MAX_PATH` | `260` | | `SAVE_DIALOG_BUFFER_CHARS` | `32768` |
-| `COINIT_APARTMENTTHREADED` | `0x2` | | | |
+| `COINIT_APARTMENTTHREADED` | `0x2` | 2026-10-29 | Review | Реализованы WinConst, 3 структуры, 5 JNA-интерфейсов, WinApiException, DpiAwareness, WindowHandles и тесты (6 шт.). `gradlew test --tests ...windows.*` - 6 пройдено; `gradlew build` - BUILD SUCCESSFUL. Отклонений нет. Ручная проверка не требуется. Незакоммиченные изменения в `.idea/` не относятся к задаче и не затронуты. |
 
 HWND-константы получаются как `HWND(Pointer.createConstant(WinConst.HWND_TOPMOST_VALUE.toLong()))`.
 
@@ -300,9 +300,9 @@ HWND-константы получаются как `HWND(Pointer.createConstant
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Все объявления раздела 6 есть, имена функций — как в WinAPI.
-- [ ] Размеры структур — 24 / 152 / 64.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Все объявления раздела 6 есть, имена функций — как в WinAPI.
+- [x] Размеры структур — 24 / 152 / 64.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -324,4 +324,4 @@ HWND-константы получаются как `HWND(Pointer.createConstant
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-29 | Review | Реализованы WinConst, 3 структуры, 5 JNA-интерфейсов, WinApiException, DpiAwareness, WindowHandles и тесты (6 шт.). `gradlew test --tests ...windows.*` - 6 пройдено; `gradlew build` - BUILD SUCCESSFUL. Отклонений нет. Ручная проверка не требуется. Незакоммиченные изменения в `.idea/` не относятся к задаче и не затронуты. |
