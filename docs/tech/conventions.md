@@ -147,7 +147,8 @@ fast-cow-screenshot/
   `DpiAwareness.enterPerMonitorV2()` (TASK-005). Все координаты в `domain`, `capture` и `platform` — **физические пиксели
   виртуального рабочего стола**.
 - Флаги JVM (заданы в `build.gradle.kts`, TASK-001): `--enable-native-access=ALL-UNNAMED`,
-  `--sun-misc-unsafe-memory-access=allow`, `-Xmx768m`.
+  `--sun-misc-unsafe-memory-access=allow`, `-Xmx768m`; для возврата памяти ОС в простое (REQ-001.N6, TASK-019, CLR-005) —
+  `-XX:G1PeriodicGCInterval=15000`, `-XX:MinHeapFreeRatio=10`, `-XX:MaxHeapFreeRatio=20`.
 
 ## 8. Логирование
 
@@ -210,3 +211,4 @@ fast-cow-screenshot/
 | 2026-10-29 | §9: агент MockK через `-javaagent` в тестовой JVM | CLR-001, CLR-002, TASK-004 |
 | 2026-10-31 | §9: правило для Compose-событий клавиатуры | CLR-003, TASK-017 |
 | 2026-10-31 | §1: runtime дистрибутива — явный список модулей (Temurin 25 без jmods) | CLR-004, TASK-018 |
+| 2026-10-31 | §7: флаги G1 для возврата памяти ОС | CLR-005, TASK-019 |

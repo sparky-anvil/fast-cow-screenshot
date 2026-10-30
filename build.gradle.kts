@@ -34,6 +34,10 @@ val appJvmArgs = listOf(
     "--enable-native-access=ALL-UNNAMED",
     "--sun-misc-unsafe-memory-access=allow",
     "-Xmx768m",
+    // Возврат свободной памяти heap ОС в простое (REQ-001.N6, CLR-005).
+    "-XX:G1PeriodicGCInterval=15000",
+    "-XX:MinHeapFreeRatio=10",
+    "-XX:MaxHeapFreeRatio=20",
 )
 
 tasks.test {
