@@ -46,7 +46,7 @@
 | [TASK-010](tasks/TASK-010-capture-coordinator.md) | Координатор захвата и потоки | TDD-001 | 006, 008, 009 | L | Done |
 | [TASK-011](tasks/TASK-011-notification-window.md) | Окно уведомлений | TDD-001 | 003, 005, 010 | M | Done |
 | [TASK-012](tasks/TASK-012-save-as.md) | «Сохранить как…» | TDD-001 | 003, 004, 005, 009, 010 | M | Review |
-| [TASK-013](tasks/TASK-013-region-overlay.md) | Оверлей выделения области | TDD-001 | 002, 005, 010 | L | Ready |
+| [TASK-013](tasks/TASK-013-region-overlay.md) | Оверлей выделения области | TDD-001 | 002, 005, 010 | L | Review |
 | [TASK-014](tasks/TASK-014-settings-window.md) | Окно настроек | TDD-001 | 004, 005, 007, 009, 010, 011 | L | Ready |
 | [TASK-015](tasks/TASK-015-tray-app-wiring.md) | Трей, сборка приложения, приёмка | TDD-001 | 011, 012, 013, 014 | M | Ready |
 | [TASK-016](tasks/TASK-016-distribution-and-nfr.md) | Дистрибутив app-image и замеры NFR | TDD-001 | 015 | S | Ready |
