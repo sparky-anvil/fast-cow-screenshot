@@ -48,8 +48,8 @@
 | [TASK-012](tasks/TASK-012-save-as.md) | «Сохранить как…» | TDD-001 | 003, 004, 005, 009, 010 | M | Done |
 | [TASK-013](tasks/TASK-013-region-overlay.md) | Оверлей выделения области | TDD-001 | 002, 005, 010 | L | Done |
 | [TASK-014](tasks/TASK-014-settings-window.md) | Окно настроек | TDD-001 | 004, 005, 007, 009, 010, 011 | L | Done |
-| [TASK-015](tasks/TASK-015-tray-app-wiring.md) | Трей, сборка приложения, приёмка | TDD-001 | 011, 012, 013, 014, 017 | M | Review |
-| [TASK-016](tasks/TASK-016-distribution-and-nfr.md) | Дистрибутив app-image и замеры NFR | TDD-001 | 015 | S | Ready |
+| [TASK-015](tasks/TASK-015-tray-app-wiring.md) | Трей, сборка приложения, приёмка | TDD-001 | 011, 012, 013, 014, 017 | M | Done |
+| [TASK-016](tasks/TASK-016-distribution-and-nfr.md) | Дистрибутив app-image и замеры NFR | TDD-001 | 015 | S | Blocked |
 | [TASK-017](tasks/TASK-017-fix-hotkey-recording.md) | Исправление записи сочетания клавиш (CLR-003) | TDD-001 | 014 | S | Done |
 
 ## Порядок выполнения
@@ -68,3 +68,4 @@ TASK-002/003/005 и TASK-011/012/013 между собой независимы.
 | [CLR-001](clarifications/CLR-001-mockk-self-attach-jdk25.md) | MockK self-attach на JDK 25: нужен флаг в tasks.test | TASK-004 | Tech | Да | Closed |
 | [CLR-002](clarifications/CLR-002-mockk-agent-cyrillic-path.md) | Self-attach MockK падает из-за кириллицы в пути к Gradle-кэшу | TASK-004 | Tech | Да | Closed |
 | [CLR-003](clarifications/CLR-003-compose-native-key-event-cast.md) | ClassCastException nativeKeyEvent в окне настроек (шаг 26 приёмки) | TASK-015 (дефект TASK-014) | Tech | Да | Closed |
+| [CLR-004](clarifications/CLR-004-jlink-no-jmods-temurin25.md) | createDistributable: Temurin 25 без jmods, jlink падает | TASK-016 | Tech | Да | Open |
