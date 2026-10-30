@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Review |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
@@ -244,11 +244,11 @@ tray = TrayController(last, { saveAsAction.run() }, { settingsWindow.show() }, {
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–4 выполнены; контракты — как в разделе 6.
-- [ ] `.\gradlew.bat build` → `BUILD SUCCESSFUL`.
-- [ ] Результаты ручных шагов 1–31 записаны в журнал. Каждый провал оформлен CLR к Tech с номером шага и логом
+- [x] Шаги 1–4 выполнены; контракты — как в разделе 6.
+- [x] `.\gradlew.bat build` → `BUILD SUCCESSFUL`.
+- [x] Результаты ручных шагов 1–31 записаны в журнал. Каждый провал оформлен CLR к Tech с номером шага и логом
       `%LOCALAPPDATA%\fast-cow-screenshot\logs\app.log`.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -276,3 +276,5 @@ tray = TrayController(last, { saveAsAction.run() }, { settingsWindow.show() }, {
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
 | 2026-10-31 | Blocked | Шаги 1–4 выполнены, `.\gradlew.bat build` успешен, `HotkeyConflictMessageTest` проходит. Для `notifier` и `saveAsAction` добавлены явные типы (рекурсивный вывод типов). Приёмка: шаги 1–25, 27 — пользователь: «Работает» (замечание к шагу 1: пункт «Выход» в меню трея при ПКМ скрывается за панелью задач — AWT PopupMenu, вне задачи); шаг 26 не проходит: ClassCastException в SettingsWindow.kt:107 → [CLR-003](../clarifications/CLR-003-compose-native-key-event-cast.md) (Tech). Шаги 28–31 не выполнялись. |
+| 2026-10-31 | In Progress | CLR-003 закрыт, TASK-017 в Done; возобновлена. |
+| 2026-10-31 | Review | `.\gradlew.bat build` успешен. Ручная приёмка (пользователь): шаги 1–25, 27 — «Работает»; после TASK-017 шаги 26, 28–31 — «Работает как описано». Известное ограничение: пункт «Выход» меню трея частично за панелью задач (AWT PopupMenu), не дефект. Отклонение: явные типы у `notifier` и `saveAsAction` (рекурсивный вывод типов). |
