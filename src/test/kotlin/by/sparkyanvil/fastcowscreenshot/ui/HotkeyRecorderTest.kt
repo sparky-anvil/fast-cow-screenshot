@@ -30,6 +30,34 @@ class HotkeyRecorderTest {
     }
 
     @Test
+    fun `escape cancels recording`() {
+        assertEquals(RecordingStep.Cancel, HotkeyRecorder.onKeyDown(false, false, false, KeyEvent.VK_ESCAPE))
+    }
+
+    @Test
+    fun `escape with ctrl still cancels`() {
+        assertEquals(RecordingStep.Cancel, HotkeyRecorder.onKeyDown(true, false, false, KeyEvent.VK_ESCAPE))
+    }
+
+    @Test
+    fun `modifier only waits`() {
+        assertEquals(RecordingStep.Wait, HotkeyRecorder.onKeyDown(true, false, false, KeyEvent.VK_CONTROL))
+    }
+
+    @Test
+    fun `invalid combination`() {
+        assertEquals(RecordingStep.Invalid, HotkeyRecorder.onKeyDown(false, false, true, KeyEvent.VK_A))
+    }
+
+    @Test
+    fun `ctrl alt r applies`() {
+        assertEquals(
+            RecordingStep.Apply(HotkeyBinding(true, true, false, 0x52)),
+            HotkeyRecorder.onKeyDown(true, true, false, KeyEvent.VK_R),
+        )
+    }
+
+    @Test
     fun `detects modifier keys`() {
         assertTrue(HotkeyRecorder.isModifierKey(KeyEvent.VK_SHIFT))
         assertFalse(HotkeyRecorder.isModifierKey(KeyEvent.VK_A))

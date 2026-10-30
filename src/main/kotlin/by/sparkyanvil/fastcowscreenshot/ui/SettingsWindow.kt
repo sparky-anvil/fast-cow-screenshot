@@ -17,6 +17,7 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isAltPressed
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
@@ -35,13 +41,15 @@ import by.sparkyanvil.fastcowscreenshot.platform.windows.WindowHandles
 import by.sparkyanvil.fastcowscreenshot.settings.AppSettings
 import by.sparkyanvil.fastcowscreenshot.settings.HotkeyAction
 import by.sparkyanvil.fastcowscreenshot.settings.SettingsStore
-import java.awt.event.KeyEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
 /** Окно настроек. show() — на EDT. */
 internal class SettingsWindow(private val controller: SettingsController, private val store: SettingsStore) {
     private val settingsState = mutableStateOf(store.current)
+    private val recording = mutableStateOf<HotkeyAction?>(null)
     private var window: ComposeWindow? = null
 
     init {
@@ -60,8 +68,13 @@ internal class SettingsWindow(private val controller: SettingsController, privat
             title = TITLE
             setSize(WIDTH, HEIGHT)
             defaultCloseOperation = WindowConstants.HIDE_ON_CLOSE
+            addWindowListener(object : WindowAdapter() {
+                override fun windowClosing(e: WindowEvent) {
+                    cancelRecording()
+                }
+            })
             setLocationRelativeTo(null)
-            setContent { SettingsContent(settingsState.value, controller) }
+            setContent { SettingsContent(settingsState.value, controller, recording) }
         }
         window = w
         w.isVisible = true
@@ -70,8 +83,16 @@ internal class SettingsWindow(private val controller: SettingsController, privat
 
     /** Закрывает и освобождает окно. */
     fun dispose() {
+        cancelRecording()
         window?.dispose()
         window = null
+    }
+
+    private fun cancelRecording() {
+        if (recording.value != null) {
+            controller.cancelHotkeyRecording()
+            recording.value = null
+        }
     }
 
     companion object {
@@ -85,15 +106,19 @@ private val ERROR_COLOR = Color(0xFFD32F2F)
 
 /** Содержимое окна настроек. */
 @Composable
-internal fun SettingsContent(s: AppSettings, controller: SettingsController) {
+internal fun SettingsContent(
+    s: AppSettings,
+    controller: SettingsController,
+    recording: MutableState<HotkeyAction?>,
+) {
     var dirError by remember { mutableStateOf<String?>(null) }
     var hotkeyError by remember { mutableStateOf<String?>(null) }
     var generalError by remember { mutableStateOf<String?>(null) }
-    var recording by remember { mutableStateOf<HotkeyAction?>(null) }
+    var recordingAction by recording
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(recording) {
-        if (recording != null) focusRequester.requestFocus()
+    LaunchedEffect(recordingAction) {
+        if (recordingAction != null) focusRequester.requestFocus()
     }
 
     MaterialTheme {
@@ -102,23 +127,21 @@ internal fun SettingsContent(s: AppSettings, controller: SettingsController) {
                 .focusRequester(focusRequester)
                 .focusable()
                 .onPreviewKeyEvent { e ->
-                    val action = recording
+                    val action = recordingAction
                     if (action == null || e.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                    val k = e.nativeKeyEvent as KeyEvent
-                    if (k.keyCode == KeyEvent.VK_ESCAPE) {
-                        controller.cancelHotkeyRecording()
-                        recording = null
-                        return@onPreviewKeyEvent true
+                    val step = HotkeyRecorder.onKeyDown(
+                        e.isCtrlPressed, e.isAltPressed, e.isShiftPressed, e.key.nativeKeyCode,
+                    )
+                    when (step) {
+                        RecordingStep.Wait -> return@onPreviewKeyEvent true
+                        RecordingStep.Cancel -> controller.cancelHotkeyRecording()
+                        RecordingStep.Invalid -> {
+                            hotkeyError = SettingsController.ERR_INVALID_COMBO
+                            controller.cancelHotkeyRecording()
+                        }
+                        is RecordingStep.Apply -> hotkeyError = controller.applyHotkey(action, step.binding)
                     }
-                    if (HotkeyRecorder.isModifierKey(k.keyCode)) return@onPreviewKeyEvent true
-                    val b = HotkeyRecorder.toBinding(k.isControlDown, k.isAltDown, k.isShiftDown, k.keyCode)
-                    if (b == null) {
-                        hotkeyError = SettingsController.ERR_INVALID_COMBO
-                        controller.cancelHotkeyRecording()
-                    } else {
-                        hotkeyError = controller.applyHotkey(action, b)
-                    }
-                    recording = null
+                    recordingAction = null
                     true
                 },
         ) {
@@ -152,11 +175,11 @@ internal fun SettingsContent(s: AppSettings, controller: SettingsController) {
                     Row {
                         Text(action.displayName, Modifier.width(200.dp))
                         Text(
-                            if (recording == action) "Нажмите сочетание… (Esc — отмена)" else s.hotkeyBinding(action).format(),
+                            if (recordingAction == action) "Нажмите сочетание… (Esc — отмена)" else s.hotkeyBinding(action).format(),
                             Modifier.width(240.dp),
                         )
                         OutlinedButton(onClick = {
-                            recording = action
+                            recordingAction = action
                             hotkeyError = null
                             controller.beginHotkeyRecording()
                         }) { Text("Изменить") }
