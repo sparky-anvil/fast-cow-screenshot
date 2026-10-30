@@ -55,7 +55,25 @@ compose.desktop {
             targetFormats(TargetFormat.Msi)
             packageName = "fast-cow-screenshot"
             packageVersion = "1.0.0"
-            includeAllModules = true
+            // Temurin 25 без jmods (JEP 493): jdk.jlink в образ включать нельзя, поэтому список модулей явный (CLR-004).
+            modules(
+                "java.datatransfer",
+                "java.desktop",
+                "java.instrument",
+                "java.logging",
+                "java.management",
+                "java.naming",
+                "java.prefs",
+                "java.sql",
+                "java.xml",
+                "jdk.accessibility",
+                "jdk.charsets",
+                "jdk.localedata",
+                "jdk.management",
+                "jdk.unsupported",
+                "jdk.unsupported.desktop",
+                "jdk.zipfs",
+            )
         }
     }
 }

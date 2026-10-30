@@ -2,13 +2,13 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Blocked |
+| Статус | Ready |
 | Приоритет | Must |
 | Оценка | S (≤ 1 ч) + время замеров пользователем |
 | Технический дизайн | TDD-001 |
 | Требования | REQ-001.N1–N4, N6, N7, N8 |
 | ADR | ADR-001 |
-| Зависит от | TASK-015 |
+| Зависит от | TASK-015, TASK-018 |
 | Блокирует | — |
 
 > Перед началом прочитай `docs/tech/conventions.md`. Всё, что не сказано в этой задаче, делается по соглашениям оттуда.
@@ -21,7 +21,8 @@
 
 ## 2. Контекст
 
-- `build.gradle.kts` (TASK-001) уже содержит `compose.desktop.application.nativeDistributions` с `includeAllModules = true`
+- `build.gradle.kts` содержит `compose.desktop.application.nativeDistributions` с явным списком `modules(...)`
+  (TASK-018, CLR-004: Temurin 25 без `jmods` не может включить `jdk.jlink`, поэтому `includeAllModules` не используется)
   и `jvmArgs` (`--enable-native-access=ALL-UNNAMED`, `--sun-misc-unsafe-memory-access=allow`, `-Xmx768m`).
 - Задача `createDistributable` (Compose Gradle plugin) вызывает `jpackage --type app-image`. WiX для неё не нужен.
 - Время в логе: `Captured <mode> WxH in N ms` (TASK-010), `Overlay shown in N ms` (TASK-013), `Saved <path> in N ms` (TASK-009).
@@ -131,6 +132,10 @@ p95 из 50 замеров: отсортировать по возрастани
 ## 14. Чего НЕ делать
 
 - Не собирать MSI (`packageMsi`) — вне рамок.
+- Не возвращать `includeAllModules = true` и не добавлять `jdk.jlink`/`jdk.jpackage` в `modules(...)` (CLR-004).
+
+**Возобновление после CLR-004:** после `Done` у TASK-018 начать с шага 1. Дистрибутив, собранный в TASK-018, можно
+использовать, если после него `build.gradle.kts` и `src/` не менялись.
 - Не менять `-Xmx` и флаги JVM без CLR.
 
 ## 15. Ловушки и подсказки

@@ -23,7 +23,7 @@
 | Сериализация настроек | kotlinx.serialization JSON | 1.11.0 | `org.jetbrains.kotlinx:kotlinx-serialization-json`, плагин `org.jetbrains.kotlin.plugin.serialization` 2.4.21 | ADR-003 |
 | Логирование | SLF4J + Logback | 2.0.17 / 1.5.38 | `org.slf4j:slf4j-api`, `ch.qos.logback:logback-classic` | ADR-003 |
 | Тесты | JUnit Jupiter + MockK + kotlin-test | 6.1.3 / 1.14.11 / 2.4.21 | `org.junit:junit-bom`, `org.junit.jupiter:junit-jupiter`, `org.junit.platform:junit-platform-launcher`, `io.mockk:mockk`, `org.jetbrains.kotlin:kotlin-test` | ADR-003 |
-| Упаковка | Compose `nativeDistributions` → `createDistributable` (jpackage app-image) | — | — | ADR-001 |
+| Упаковка | Compose `nativeDistributions` → `createDistributable` (jpackage app-image); runtime — явный список `modules(...)`, без `includeAllModules` и без `jdk.jlink`/`jdk.jpackage` (Temurin 25 без `jmods`, JEP 493; CLR-004) | — | — | ADR-001 |
 
 Добавлять зависимости, не перечисленные в этой таблице или в задаче, **запрещено**. `kotlinx-coroutines` приходит
 транзитивно через Compose — в своём коде его **не использовать**.
@@ -209,3 +209,4 @@ fast-cow-screenshot/
 | 2026-10-18 | Первая версия | ADR-001, ADR-002, ADR-003 |
 | 2026-10-29 | §9: агент MockK через `-javaagent` в тестовой JVM | CLR-001, CLR-002, TASK-004 |
 | 2026-10-31 | §9: правило для Compose-событий клавиатуры | CLR-003, TASK-017 |
+| 2026-10-31 | §1: runtime дистрибутива — явный список модулей (Temurin 25 без jmods) | CLR-004, TASK-018 |
