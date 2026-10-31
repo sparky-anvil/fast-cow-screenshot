@@ -31,7 +31,7 @@ RES-001 показал, что AWT `Robot` при HiDPI работает в ло
 
 ## Решение
 
-JNA 5.19.1. Весь WinAPI-код находится в пакете `by.sparkyanvil.fastcow.platform.windows`.
+JNA 5.19.1. Весь WinAPI-код находится в пакете `by.sparkyanvil.fastcowscreenshot.platform.windows`.
 
 - Захват: `EnumDisplayMonitors` / `GetMonitorInfoW` / `MonitorFromPoint` + GDI `BitBlt(SRCCOPY | CAPTUREBLT)` в 32-битную
   DIB-секцию. Поток захвата работает в контексте `DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2`

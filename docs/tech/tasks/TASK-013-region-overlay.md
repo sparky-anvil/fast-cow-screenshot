@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | L (3–6 ч) |
 | Технический дизайн | TDD-001 |
@@ -62,11 +62,11 @@
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
-| 1 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/SelectionState.kt` | Создать | чистая логика |
-| 2 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/RegionOverlay.kt` | Создать | `RegionOverlay` + `private class OverlayPanel` |
-| 3 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/CursorPosition.kt` | Создать | object |
-| 4 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/OverlayWindowPlacer.kt` | Создать | object |
-| 5 | `src/test/kotlin/by/sparkyanvil/fastcow/ui/SelectionStateTest.kt` | Создать | unit |
+| 1 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/SelectionState.kt` | Создать | чистая логика |
+| 2 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/RegionOverlay.kt` | Создать | `RegionOverlay` + `private class OverlayPanel` |
+| 3 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/CursorPosition.kt` | Создать | object |
+| 4 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/OverlayWindowPlacer.kt` | Создать | object |
+| 5 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/ui/SelectionStateTest.kt` | Создать | unit |
 
 **Файлы, которые изменять нельзя:** все, кроме перечисленных.
 
@@ -77,7 +77,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.ui
+package by.sparkyanvil.fastcowscreenshot.ui
 
 /** Выделение. Только EDT, не потокобезопасен. */
 internal class SelectionState {
@@ -108,7 +108,7 @@ internal class RegionOverlay : RegionSelector {
 ```
 
 ```kotlin
-package by.sparkyanvil.fastcow.platform.windows
+package by.sparkyanvil.fastcowscreenshot.platform.windows
 
 /** Позиция курсора в физических пикселях. Вызывать на EDT или fcs-capture. */
 internal object CursorPosition {
@@ -225,18 +225,18 @@ g2.dispose()
 
 | Команда | Ожидаемый результат |
 |---|---|
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.ui.SelectionStateTest"` | 5 тестов |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.ui.SelectionStateTest"` | 5 тестов |
 | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 
 Ручная — шаги 14–20 TASK-015.
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–4 выполнены; контракты — как в разделе 6.
-- [ ] `onResult` вызывается ровно один раз во всех сценариях.
-- [ ] Рисование без масштабирования (`NEAREST_NEIGHBOR`, сброс масштаба).
-- [ ] 5 тестов проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Шаги 1–4 выполнены; контракты — как в разделе 6.
+- [x] `onResult` вызывается ровно один раз во всех сценариях.
+- [x] Рисование без масштабирования (`NEAREST_NEIGHBOR`, сброс масштаба).
+- [x] 5 тестов проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -260,4 +260,4 @@ g2.dispose()
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-30 | Review | Реализованы SelectionState, CursorPosition, OverlayWindowPlacer, RegionOverlay (+ OverlayPanel) и 5 тестов SelectionStateTest. `gradlew build` — BUILD SUCCESSFUL, 5/5. Отклонений нет. Ручная проверка оверлея (мультимонитор, HiDPI) — шаги 14–20 TASK-015. TASK-012 переведена в Done по указанию пользователя. |

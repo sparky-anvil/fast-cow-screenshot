@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
@@ -45,12 +45,12 @@
 
 ## 3. Предусловия
 
-- Выполнена TASK-001: сборка работает, пакет `by.sparkyanvil.fastcow` существует.
+- Выполнена TASK-001: сборка работает, пакет `by.sparkyanvil.fastcowscreenshot` существует.
 - `.\gradlew.bat build` → `BUILD SUCCESSFUL`.
 
 ## 4. Область изменений
 
-Базовый путь `M = src/main/kotlin/by/sparkyanvil/fastcow/domain/`, `T = src/test/kotlin/by/sparkyanvil/fastcow/domain/`.
+Базовый путь `M = src/main/kotlin/by/sparkyanvil/fastcowscreenshot/domain/`, `T = src/test/kotlin/by/sparkyanvil/fastcowscreenshot/domain/`.
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
@@ -73,7 +73,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.domain
+package by.sparkyanvil.fastcowscreenshot.domain
 
 /** Точка в физических пикселях виртуального рабочего стола. Неизменяема. */
 internal data class PixelPoint(val x: Int, val y: Int)
@@ -249,19 +249,19 @@ B = `MonitorInfo("\\\\.\\DISPLAY2", PixelRect(-2560,0,2560,1440), PixelRect(-256
 
 | Команда | Ожидаемый результат |
 |---|---|
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.domain.*"` | 17 тестов пройдены |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.domain.*"` | 17 тестов пройдены |
 | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 
 Ручная проверка не нужна.
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Все шаги раздела 7 выполнены.
-- [ ] Сигнатуры совпадают с разделом 6.
-- [ ] Все случаи раздела 9 обработаны.
-- [ ] Все тесты раздела 11 написаны и проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
-- [ ] В пакете `domain` нет импортов `java.awt.*` (кроме `java.awt.image.BufferedImage`), `javax.swing`, `com.sun.jna`.
+- [x] Все шаги раздела 7 выполнены.
+- [x] Сигнатуры совпадают с разделом 6.
+- [x] Все случаи раздела 9 обработаны.
+- [x] Все тесты раздела 11 написаны и проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] В пакете `domain` нет импортов `java.awt.*` (кроме `java.awt.image.BufferedImage`), `javax.swing`, `com.sun.jna`.
 
 ## 14. Чего НЕ делать
 
@@ -281,4 +281,4 @@ B = `MonitorInfo("\\\\.\\DISPLAY2", PixelRect(-2560,0,2560,1440), PixelRect(-256
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-24 | Review | Реализовано по задаче без отклонений. TASK-001 переведена в Done по указанию пользователя. `gradlew build` — BUILD SUCCESSFUL; 17 тестов domain + 2 AppInfo пройдены. |

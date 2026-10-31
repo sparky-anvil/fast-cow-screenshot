@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | L (3–6 ч) |
 | Технический дизайн | TDD-001 |
@@ -32,7 +32,7 @@
 - **Запись сочетания.** Пока ждём нажатие, все глобальные клавиши сняты (`unregisterAll`). Иначе нажатие текущего
   сочетания перехватит Windows и запустит захват. После записи или отмены всё регистрируется заново (`registerAll`).
 - Коды клавиш AWT (`java.awt.event.KeyEvent.VK_*`) для `0–9`, `A–Z`, `F1–F12` численно совпадают с виртуальными
-  кодами Windows. Поэтому `nativeKeyEvent.keyCode` передаётся в `HotkeyBinding` напрямую.
+  кодами Windows. Поэтому `e.key.nativeKeyCode` передаётся в `HotkeyBinding` напрямую (исправлено TASK-017, CLR-003).
 - Окно исключается из захвата (`WindowHandles.excludeFromCapture`) после первого показа.
 
 **Выдержки из требований (дословно):**
@@ -57,12 +57,12 @@
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
-| 1 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/WindowsFolderDialog.kt` | Создать | диалог папки |
-| 2 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/HotkeyRecorder.kt` | Создать | object |
-| 3 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/SettingsController.kt` | Создать | логика |
-| 4 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/SettingsWindow.kt` | Создать | окно + `@Composable SettingsContent` |
-| 5 | `src/test/kotlin/by/sparkyanvil/fastcow/ui/SettingsControllerTest.kt` | Создать | unit |
-| 6 | `src/test/kotlin/by/sparkyanvil/fastcow/ui/HotkeyRecorderTest.kt` | Создать | unit |
+| 1 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/WindowsFolderDialog.kt` | Создать | диалог папки |
+| 2 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/HotkeyRecorder.kt` | Создать | object |
+| 3 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/SettingsController.kt` | Создать | логика |
+| 4 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/SettingsWindow.kt` | Создать | окно + `@Composable SettingsContent` |
+| 5 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/ui/SettingsControllerTest.kt` | Создать | unit |
+| 6 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/ui/HotkeyRecorderTest.kt` | Создать | unit |
 
 **Файлы, которые изменять нельзя:** все, кроме перечисленных.
 
@@ -73,7 +73,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.platform.windows
+package by.sparkyanvil.fastcowscreenshot.platform.windows
 
 /** SHBrowseForFolderW. Вызывать на fcs-dialog. Не бросает. */
 internal class WindowsFolderDialog(private val shell32: Shell32Api = Shell32Api.INSTANCE) {
@@ -84,7 +84,7 @@ internal class WindowsFolderDialog(private val shell32: Shell32Api = Shell32Api.
 ```
 
 ```kotlin
-package by.sparkyanvil.fastcow.ui
+package by.sparkyanvil.fastcowscreenshot.ui
 
 internal object HotkeyRecorder {
     /** Коды клавиш-модификаторов AWT: VK_CONTROL, VK_SHIFT, VK_ALT, VK_WINDOWS, VK_ALT_GRAPH. */
@@ -206,8 +206,9 @@ finally { Ole32.INSTANCE.CoTaskMemFree(pidl) }
   3. `Row { Checkbox(s.autoSaveEnabled) { generalError = controller.setAutoSave(it) }; Text("Автоматически сохранять снимки в директорию по умолчанию") }`.
   4. `Text("Горячие клавиши", fontWeight = Bold)`; для каждого `action`: `Row { Text(action.displayName, Modifier.width(200.dp)); Text(if (recording == action) "Нажмите сочетание… (Esc — отмена)" else s.hotkeyBinding(action).format(), Modifier.width(240.dp)); OutlinedButton("Изменить") { recording = action; hotkeyError = null; controller.beginHotkeyRecording() } }`;
      `hotkeyError` — красным под списком.
-  5. Корневой модификатор окна: `Modifier.onPreviewKeyEvent { e -> … }` — только если `recording != null` и `e.type == KeyEventType.KeyDown`:
-     `k = e.nativeKeyEvent as java.awt.event.KeyEvent`; `Esc` (`VK_ESCAPE`) → `controller.cancelHotkeyRecording(); recording = null`;
+   5. Корневой модификатор окна: `Modifier.onPreviewKeyEvent { e -> … }` — **заменён TASK-017 (CLR-003)**; прежняя версия:
+      только если `recording != null` и `e.type == KeyEventType.KeyDown`:
+     ~~`k = e.nativeKeyEvent as java.awt.event.KeyEvent`~~; `Esc` (`VK_ESCAPE`) → `controller.cancelHotkeyRecording(); recording = null`;
      модификатор (`HotkeyRecorder.isModifierKey`) → ждать дальше; иначе `b = HotkeyRecorder.toBinding(k.isControlDown, k.isAltDown, k.isShiftDown, k.keyCode)`:
      `null` → `hotkeyError = ERR_INVALID_COMBO`, `controller.cancelHotkeyRecording()`; иначе `hotkeyError = controller.applyHotkey(action, b)`. В обоих случаях `recording = null`; вернуть `true`.
   6. `generalError` — красным внизу. Состояния `dirError`, `hotkeyError`, `generalError`, `recording` — `remember { mutableStateOf(...) }`.
@@ -265,18 +266,18 @@ finally { Ole32.INSTANCE.CoTaskMemFree(pidl) }
 
 | Команда | Ожидаемый результат |
 |---|---|
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.ui.HotkeyRecorderTest"` | 5 тестов |
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.ui.SettingsControllerTest"` | 10 тестов |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.ui.HotkeyRecorderTest"` | 5 тестов |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.ui.SettingsControllerTest"` | 10 тестов |
 | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 
 Ручная — шаги 21–27 TASK-015.
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–4 выполнены; контракты — как в разделе 6.
-- [ ] Все случаи раздела 9 дают указанные тексты.
-- [ ] 15 тестов проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Шаги 1–4 выполнены; контракты — как в разделе 6.
+- [x] Все случаи раздела 9 дают указанные тексты.
+- [x] 15 тестов проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -286,8 +287,10 @@ finally { Ole32.INSTANCE.CoTaskMemFree(pidl) }
 
 ## 15. Ловушки и подсказки
 
-- `ComposeWindow` — `androidx.compose.ui.awt.ComposeWindow`. `e.nativeKeyEvent` на desktop — `java.awt.event.KeyEvent`
-  (тип `Any`, нужно приведение `as`).
+- `ComposeWindow` — `androidx.compose.ui.awt.ComposeWindow`.
+- **Исправлено (CLR-003, TASK-017):** `e.nativeKeyEvent` в Compose 1.12.2 — `InternalKeyEvent`, приведение к
+  `java.awt.event.KeyEvent` падает. Обработка нажатий в §8.5 п.5 заменена на
+  `HotkeyRecorder.onKeyDown(e.isCtrlPressed, e.isAltPressed, e.isShiftPressed, e.key.nativeKeyCode)` — см. TASK-017.
 - `String.format` с кириллицей — `ERR_TAKEN_FORMAT.format(x)` (Kotlin `String.format`).
 - `SHGetPathFromIDList` пишет строку с завершающим `\u0000` — `Native.toString(CharArray)` обрезает его.
 - Окно закрывается крестиком через `HIDE_ON_CLOSE`. Приложение при этом не завершается (выход — только из трея).
@@ -298,4 +301,4 @@ finally { Ole32.INSTANCE.CoTaskMemFree(pidl) }
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-31 | Review | Реализованы шаги 1–4, 15 тестов зелёные, `.\gradlew.bat build` успешен. Отклонение: поле окна названо `settingsState` вместо `state` (конфликт с `Frame.state` внутри `ComposeWindow.apply`). Ручная проверка (шаги 21–27 TASK-015) — после TASK-015. TASK-013 переведена в Done по указанию пользователя. |

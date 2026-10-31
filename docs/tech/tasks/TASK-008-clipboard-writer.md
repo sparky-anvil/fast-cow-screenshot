@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
@@ -53,14 +53,14 @@
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
-| 1 | `src/main/kotlin/by/sparkyanvil/fastcow/capture/ClipboardResult.kt` | Создать | sealed |
-| 2 | `src/main/kotlin/by/sparkyanvil/fastcow/capture/ClipboardWriter.kt` | Создать | интерфейс |
-| 3 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/DibEncoder.kt` | Создать | чистый кодер |
-| 4 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/ClipboardRetry.kt` | Создать | повторы |
-| 5 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/WindowsClipboardWriter.kt` | Создать | реализация |
-| 6 | `src/test/kotlin/by/sparkyanvil/fastcow/platform/windows/DibEncoderTest.kt` | Создать | unit |
-| 7 | `src/test/kotlin/by/sparkyanvil/fastcow/platform/windows/ClipboardRetryTest.kt` | Создать | unit |
-| 8 | `src/test/kotlin/by/sparkyanvil/fastcow/platform/windows/WindowsClipboardWriterTest.kt` | Создать | integration |
+| 1 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/capture/ClipboardResult.kt` | Создать | sealed |
+| 2 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/capture/ClipboardWriter.kt` | Создать | интерфейс |
+| 3 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/DibEncoder.kt` | Создать | чистый кодер |
+| 4 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/ClipboardRetry.kt` | Создать | повторы |
+| 5 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/WindowsClipboardWriter.kt` | Создать | реализация |
+| 6 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/DibEncoderTest.kt` | Создать | unit |
+| 7 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/ClipboardRetryTest.kt` | Создать | unit |
+| 8 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/WindowsClipboardWriterTest.kt` | Создать | integration |
 
 **Файлы, которые изменять нельзя:** все, кроме перечисленных.
 
@@ -71,7 +71,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.capture
+package by.sparkyanvil.fastcowscreenshot.capture
 
 /** Результат записи в буфер. reason — техническое описание для лога (на английском). */
 internal sealed interface ClipboardResult {
@@ -86,7 +86,7 @@ internal interface ClipboardWriter {
 ```
 
 ```kotlin
-package by.sparkyanvil.fastcow.platform.windows
+package by.sparkyanvil.fastcowscreenshot.platform.windows
 
 /** Кодирование в упакованный CF_DIB 24 бит bottom-up. Без состояния. */
 internal object DibEncoder {
@@ -212,9 +212,9 @@ return Success
 
 | Команда | Ожидаемый результат |
 |---|---|
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.platform.windows.DibEncoderTest"` | 5 тестов |
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.platform.windows.ClipboardRetryTest"` | 2 теста |
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.platform.windows.WindowsClipboardWriterTest"` | 1 тест |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.platform.windows.DibEncoderTest"` | 5 тестов |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.platform.windows.ClipboardRetryTest"` | 2 теста |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.platform.windows.WindowsClipboardWriterTest"` | 1 тест |
 | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 
 **Ручная** (пользователь): сразу после теста 8 (процесс тестов уже завершён) открыть Paint → Ctrl+V → вставилось
@@ -223,10 +223,10 @@ return Success
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–5 выполнены; контракты — как в разделе 6.
-- [ ] После успешного `SetClipboardData` нет `GlobalFree`; во всех ветках неудачи — есть.
-- [ ] 8 тестов проходят; ручная проверка записана.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Шаги 1–5 выполнены; контракты — как в разделе 6.
+- [x] После успешного `SetClipboardData` нет `GlobalFree`; во всех ветках неудачи — есть.
+- [x] 8 тестов проходят; ручная проверка записана.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -248,4 +248,4 @@ return Success
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-29 | Review | Реализованы ClipboardResult, ClipboardWriter, DibEncoder, ClipboardRetry, WindowsClipboardWriter и 8 тестов (5 + 2 + 1), все пройдены; ``gradlew build`` - BUILD SUCCESSFUL. Ручная проверка (Paint, Ctrl+V после завершения процесса тестов): «Работает как описано». TASK-007 по решению пользователя переведена в Done. Отклонений нет. |

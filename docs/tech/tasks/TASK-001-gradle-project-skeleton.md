@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
@@ -50,11 +50,11 @@
 | 3 | `gradle.properties` | Создать | Свойства сборки |
 | 4 | `gradle/libs.versions.toml` | Создать | Version catalog |
 | 5 | `build.gradle.kts` | Создать | Плагины, зависимости, тесты, Compose application |
-| 6 | `src/main/kotlin/by/sparkyanvil/fastcow/AppInfo.kt` | Создать | `AppInfo` |
-| 7 | `src/main/kotlin/by/sparkyanvil/fastcow/Main.kt` | Создать | `main()` |
+| 6 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/AppInfo.kt` | Создать | `AppInfo` |
+| 7 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/Main.kt` | Создать | `main()` |
 | 8 | `src/main/resources/logback.xml` | Создать | Логирование |
 | 9 | `src/test/resources/logback-test.xml` | Создать | Логирование в тестах |
-| 10 | `src/test/kotlin/by/sparkyanvil/fastcow/AppInfoTest.kt` | Создать | Тест раздела 11 |
+| 10 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/AppInfoTest.kt` | Создать | Тест раздела 11 |
 | 11 | `.gitignore` | Изменить | Добавить блок Gradle в конец |
 
 **Файлы, которые изменять нельзя:** все остальные, в том числе `.idea/`, `fast-cow-screenshot.iml`, `README.md`, `docs/`.
@@ -91,7 +91,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow
+package by.sparkyanvil.fastcowscreenshot
 
 /** Константы приложения. Потокобезопасен (только константы). */
 internal object AppInfo {
@@ -101,7 +101,7 @@ internal object AppInfo {
 ```
 
 ```kotlin
-package by.sparkyanvil.fastcow
+package by.sparkyanvil.fastcowscreenshot
 
 /** Точка входа. В этой задаче только пишет строку запуска в лог и завершается. */
 fun main()
@@ -207,7 +207,7 @@ fun main()
       alias(libs.plugins.compose.multiplatform)
   }
 
-  group = "by.sparkyanvil.fastcow"
+  group = "by.sparkyanvil.fastcowscreenshot"
   version = "1.0.0"
 
   kotlin {
@@ -243,7 +243,7 @@ fun main()
 
   compose.desktop {
       application {
-          mainClass = "by.sparkyanvil.fastcow.MainKt"
+          mainClass = "by.sparkyanvil.fastcowscreenshot.MainKt"
           jvmArgs += appJvmArgs
           nativeDistributions {
               targetFormats(TargetFormat.Msi)
@@ -259,7 +259,7 @@ fun main()
 ### Шаг 6. AppInfo и Main
 - **Файлы:** `AppInfo.kt`, `Main.kt` (пути — раздел 4).
 - **Сделать:** `AppInfo` — ровно как в разделе 6. `Main.kt`:
-  - top-level `private val log = LoggerFactory.getLogger("by.sparkyanvil.fastcow.Main")`;
+  - top-level `private val log = LoggerFactory.getLogger("by.sparkyanvil.fastcowscreenshot.Main")`;
   - `fun main()` выполняет одну строку
     `log.info("{} {} started, java {}", AppInfo.NAME, AppInfo.VERSION, System.getProperty("java.version"))`.
 - **Результат:** `.\gradlew.bat compileKotlin` → `BUILD SUCCESSFUL`.
@@ -285,7 +285,7 @@ fun main()
               <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
           </encoder>
       </appender>
-      <logger name="by.sparkyanvil.fastcow" level="DEBUG"/>
+      <logger name="by.sparkyanvil.fastcowscreenshot" level="DEBUG"/>
       <root level="INFO">
           <appender-ref ref="CONSOLE"/>
           <appender-ref ref="FILE"/>
@@ -307,7 +307,7 @@ fun main()
 - **Результат:** `git status` показывает `gradle/wrapper/gradle-wrapper.jar` как новый файл; `build/` и `.gradle/` не видны.
 
 ### Шаг 9. Тест
-- **Файл:** `src/test/kotlin/by/sparkyanvil/fastcow/AppInfoTest.kt` — по разделу 11.
+- **Файл:** `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/AppInfoTest.kt` — по разделу 11.
 - **Результат:** `.\gradlew.bat build` → `BUILD SUCCESSFUL`.
 
 ## 8. Алгоритм и логика
@@ -334,7 +334,7 @@ fun main()
 
 ## 11. Тесты
 
-Файл: `src/test/kotlin/by/sparkyanvil/fastcow/AppInfoTest.kt`, класс `AppInfoTest`.
+Файл: `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/AppInfoTest.kt`, класс `AppInfoTest`.
 
 | # | Метод теста | Given | When | Then | Покрывает |
 |---|---|---|---|---|---|
@@ -357,12 +357,12 @@ fun main()
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Все шаги раздела 7 выполнены.
-- [ ] Сигнатуры совпадают с разделом 6.
-- [ ] Все тесты раздела 11 написаны и проходят.
-- [ ] Проверки раздела 12 выполнены.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
-- [ ] `gradle-wrapper.jar` не игнорируется git.
+- [x] Все шаги раздела 7 выполнены.
+- [x] Сигнатуры совпадают с разделом 6.
+- [x] Все тесты раздела 11 написаны и проходят.
+- [x] Проверки раздела 12 выполнены.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] `gradle-wrapper.jar` не игнорируется git.
 
 ## 14. Чего НЕ делать
 
@@ -389,4 +389,4 @@ fun main()
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-24 | Review | Все шаги выполнены по задаче без отклонений. Хеш Gradle совпал; wrapper 9.8.1; `gradlew build` — BUILD SUCCESSFUL, 2 теста пройдены; `gradlew run` — строка запуска в консоли и в %LOCALAPPDATA%\fast-cow-screenshot\logs\app.log. Файлы .idea/*.iml были в индексе до начала работы и не включались в коммит. |

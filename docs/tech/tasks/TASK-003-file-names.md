@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | S (≤ 1 ч) |
 | Технический дизайн | TDD-001 |
@@ -43,7 +43,7 @@
 
 ## 4. Область изменений
 
-`M = src/main/kotlin/by/sparkyanvil/fastcow/domain/`, `T = src/test/kotlin/by/sparkyanvil/fastcow/domain/`.
+`M = src/main/kotlin/by/sparkyanvil/fastcowscreenshot/domain/`, `T = src/test/kotlin/by/sparkyanvil/fastcowscreenshot/domain/`.
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
@@ -61,7 +61,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.domain
+package by.sparkyanvil.fastcowscreenshot.domain
 
 import java.nio.file.Path
 import java.time.LocalDateTime
@@ -165,14 +165,14 @@ internal object TextEllipsis {
 
 | Команда | Ожидаемый результат |
 |---|---|
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.domain.*"` | все тесты пакета проходят (включая TASK-002, если она сделана) |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.domain.*"` | все тесты пакета проходят (включая TASK-002, если она сделана) |
 | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–4 выполнены, сигнатуры — как в разделе 6.
-- [ ] 14 тестов раздела 11 проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Шаги 1–4 выполнены, сигнатуры — как в разделе 6.
+- [x] 14 тестов раздела 11 проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -191,4 +191,4 @@ internal object TextEllipsis {
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-24 | Review | Реализовано по задаче без отклонений. TASK-002 переведена в Done по указанию пользователя. `gradlew build` — BUILD SUCCESSFUL; 14 тестов TASK-003 пройдены (всего 33). |

@@ -7,7 +7,7 @@
 | Дата | 2026-10-18 |
 | Входные артефакты | REQ-001, US-001 – US-007, RES-001 |
 | ADR | ADR-001, ADR-002, ADR-003 |
-| Задачи | TASK-001 – TASK-016 |
+| Задачи | TASK-001 – TASK-019 |
 
 ## 1. Цель и рамки
 
@@ -25,7 +25,7 @@
 |---|---|---|---|---|
 | REQ-001.1, .52 | 3 режима, клавиши по умолчанию | `HotkeySettings`, `CaptureCoordinator` | TASK-004, 010 | unit + ручная |
 | REQ-001.2 | Глобальные клавиши в фоне | `WindowsHotkeyService`, `NativeMessageLoop` | TASK-007 | ручная |
-| REQ-001.3 | Уведомление о конфликте клавиши | `WindowsHotkeyService`, `FastCowApp` | TASK-007, 015 | ручная |
+| REQ-001.3 | Уведомление о конфликте клавиши | `WindowsHotkeyService`, `FastCowScreenshotApp` | TASK-007, 015 | ручная |
 | REQ-001.4 | Переназначение клавиш | `SettingsWindow`, `HotkeyBinding` | TASK-004, 014 | unit + ручная |
 | REQ-001.5 | Игнор повторных нажатий | `CaptureCoordinator` (флаг `busy`) | TASK-010 | unit |
 | REQ-001.6, .8 | Монитор под курсором, fallback на primary | `WindowsMonitorProvider` | TASK-006 | ручная + integration |
@@ -112,16 +112,16 @@ flowchart LR
 | `WindowsSaveDialog`, `WindowsMessageBox`, `SaveAsAction` | `platform.windows`, `ui` | «Сохранить как…» | `fcs-dialog` | TASK-012 |
 | `RegionOverlay`, `SelectionState` | `ui` | Оверлей выделения | EDT | TASK-013 |
 | `WindowsFolderDialog`, `SettingsWindow`, `HotkeyRecorder` | `platform.windows`, `ui` | Окно настроек | EDT + `fcs-dialog` | TASK-014 |
-| `TrayController`, `TrayIconImage`, `FastCowApp`, `Main.kt` | `ui`, `app` | Трей, сборка, запуск, выход | EDT | TASK-015 |
+| `TrayController`, `TrayIconImage`, `FastCowScreenshotApp`, `Main.kt` | `ui`, `app` | Трей, сборка, запуск, выход | EDT | TASK-015 |
 
 ### 4.2. Правила зависимостей
 
 `domain` ← `settings` ← `storage` ← `capture` ← `platform.windows` / `ui` ← `app`. `capture` знает только интерфейсы;
-реализации на WinAPI подставляет `FastCowApp`. Подробнее — `conventions.md` §3.
+реализации на WinAPI подставляет `FastCowScreenshotApp`. Подробнее — `conventions.md` §3.
 
 ## 5. Контракты
 
-Полные сигнатуры приведены в задачах; здесь — сводка межмодульных интерфейсов (пакет `by.sparkyanvil.fastcow`).
+Полные сигнатуры приведены в задачах; здесь — сводка межмодульных интерфейсов (пакет `by.sparkyanvil.fastcowscreenshot`).
 
 ```kotlin
 // domain
@@ -193,7 +193,7 @@ EDT (трей/уведомление) → `SaveAsAction.run()` → `fcs-dialog`:
   (захват 1/2) или после отмены/записи в буфер (режим 3). Сохранение в файл идёт уже после снятия флага (REQ-001.33).
 - `LastScreenshotHolder` — `AtomicReference<Screenshot?>`; слушатели вызываются через `uiExecutor`.
 - `SettingsStore` — `@Volatile current` + `synchronized(update)`.
-- Выход: `FastCowApp.exit()` на EDT → `hotkeys.stop()` → `AppThreads.shutdown(5000 мс)` → удалить трей →
+- Выход: `FastCowScreenshotApp.exit()` на EDT → `hotkeys.stop()` → `AppThreads.shutdown(5000 мс)` → удалить трей →
   `System.exit(0)`.
 
 ### 7.1. Состояния координатора
@@ -275,6 +275,7 @@ DPI awareness EDT и `fcs-capture`, регистрация каждой клав
 | N3 ≤ 250 мс | Оверлей на Java2D, рисует кадр без копирования | лог `Overlay shown in N ms` |
 | N4 ≤ 1,5 с | `ImageIO`, `compressionQuality = 0.5f` (deflate 4), `TYPE_INT_RGB` | лог `Saved {} in N ms` |
 | N6 heap ≤ 400 МБ | `-Xmx768m`; один кадр в памяти + одна DIB-копия при записи в буфер | VisualVM / Диспетчер задач, TASK-016 |
+| N6 RSS ≤ 200 МБ до первого снимка, ≤ 300 МБ после снимков, рост ≤ 10 % (ред. 3, CLR-006) | Флаги G1 возврата памяти ОС (TASK-019) | Скрипт замера TASK-019 |
 | N7 | Освобождение GDI/HGLOBAL в `finally` | 1000 захватов, TASK-016 |
 
 ## 14. Стратегия тестирования
@@ -292,9 +293,13 @@ DPI awareness EDT и `fcs-capture`, регистрация каждой клав
 | AWT/Skia не выставили per-monitor DPI процессу | Низкая | Высокое | Поток захвата сам входит в V2; EDT-awareness логируется при старте |
 | WM_DPICHANGED меняет размер окна оверлея | Средняя | Высокое | Двойной `SetWindowPos` + проверка `GetWindowRect` (TASK-013) |
 | N3 не выполняется при первом показе | Средняя | Среднее | Замер; при нарушении — CLR к Tech |
-| Skia повышает RSS > 200 МБ (N6) | Средняя | Среднее | Замер в TASK-016 |
+| Skia повышает RSS > 200 МБ (N6) | Произошёл | Среднее | ≈ 230 МБ нативной памяти после первого показа окон; N6 уточнён: ≤ 300 МБ после снимков (CLR-006) |
+| G1 не возвращает committed heap ОС после снимков: RSS 438–646 МБ при heap used 27 МБ | Произошёл | Высокое | Флаги `G1PeriodicGCInterval`, `Min/MaxHeapFreeRatio` (TASK-019, CLR-005): RSS 266–271 МБ, committed 38 МБ |
+| JDK без `jmods` (JEP 493) не включает `jdk.jlink` в образ | Произошёл | Высокое | Явный список `modules(...)` (TASK-018, CLR-004) |
 | `SHBrowseForFolderW` — пути ≤ 260 символов | Высокая | Низкое | REQ-001.51 Could; NIO работает с длинными путями |
 | Excel и др. теряют `Ctrl+Shift+1/2/3` | Высокая | Низкое | Переназначение (TASK-014) |
+| Меню трея (AWT `PopupMenu`) при ПКМ частично перекрывается панелью задач | Средняя | Низкое | Известное ограничение v1, принято (CLR-003); замена меню — вне v1 |
+| `KeyEvent.nativeKeyEvent` в Compose — не `java.awt.event.KeyEvent` | Произошёл | Высокое | `e.key.nativeKeyCode` + чистая функция `HotkeyRecorder.onKeyDown` (TASK-017, CLR-003) |
 
 ## 16. План задач
 
@@ -314,8 +319,11 @@ DPI awareness EDT и `fcs-capture`, регистрация каждой клав
 | 12 | TASK-012 | «Сохранить как…» | 003, 004, 005, 009, 010 | M |
 | 13 | TASK-013 | Оверлей выделения области | 002, 005, 010 | L |
 | 14 | TASK-014 | Окно настроек | 004, 005, 007, 009, 010, 011 | L |
-| 15 | TASK-015 | Трей, сборка приложения, запуск и выход | 011, 012, 013, 014 | M |
-| 16 | TASK-016 | Дистрибутив app-image и приёмочные замеры | 015 | S |
+| 14a | TASK-017 | Исправление записи сочетания клавиш (CLR-003) | 014 | S |
+| 15a | TASK-018 | Явный список модулей runtime (CLR-004) | 015 | S |
+| 15 | TASK-015 | Трей, сборка приложения, запуск и выход | 011, 012, 013, 014, 017 | M |
+| 15b | TASK-019 | Флаги G1 для возврата памяти ОС, замер RSS (CLR-005) | 018 | S |
+| 16 | TASK-016 | Дистрибутив app-image и приёмочные замеры | 015, 018, 019 | S |
 
 ## 17. Допущения и открытые вопросы
 
@@ -324,6 +332,8 @@ DPI awareness EDT и `fcs-capture`, регистрация каждой клав
 - **Допущение:** уведомление объединяет результат буфера и сохранения и показывается один раз после завершения
   сохранения (N12). Тексты комбинаций — TASK-011.
 - **Допущение:** «Сохранить как…» сохраняет снимок, который был последним в момент вызова (US-006, граничный случай).
+- **Допущение (CLR-005, решение пользователя):** приёмка NFR выполняется на стенде Windows 11, 1 монитор 3440×1440.
+  N2, N6 heap на 3 × 4K и N8 (Windows 10 22H2) отложены до появления эталонного стенда; v1 они не блокируют.
 - [ ] Второй экземпляр приложения: сейчас он покажет конфликт всех трёх клавиш. Нужно ли запрещать второй запуск —
   вопрос к **Analyst**, на v1 не влияет.
 - [ ] Некритичные вопросы REQ-001 §8 (оттенок серого, длительность уведомлений об ошибках, монитор уведомления) приняты

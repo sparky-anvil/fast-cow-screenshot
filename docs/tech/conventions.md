@@ -3,7 +3,7 @@
 | Поле | Значение |
 |---|---|
 | Автор | Tech |
-| Дата последнего изменения | 2026-10-18 |
+| Дата последнего изменения | 2026-10-31 |
 | Связанные ADR | ADR-001, ADR-002, ADR-003 |
 
 > Единый источник правды для Dev. Каждая задача (TASK) предполагает, что исполнитель прочитал этот документ.
@@ -23,7 +23,7 @@
 | Сериализация настроек | kotlinx.serialization JSON | 1.11.0 | `org.jetbrains.kotlinx:kotlinx-serialization-json`, плагин `org.jetbrains.kotlin.plugin.serialization` 2.4.21 | ADR-003 |
 | Логирование | SLF4J + Logback | 2.0.17 / 1.5.38 | `org.slf4j:slf4j-api`, `ch.qos.logback:logback-classic` | ADR-003 |
 | Тесты | JUnit Jupiter + MockK + kotlin-test | 6.1.3 / 1.14.11 / 2.4.21 | `org.junit:junit-bom`, `org.junit.jupiter:junit-jupiter`, `org.junit.platform:junit-platform-launcher`, `io.mockk:mockk`, `org.jetbrains.kotlin:kotlin-test` | ADR-003 |
-| Упаковка | Compose `nativeDistributions` → `createDistributable` (jpackage app-image) | — | — | ADR-001 |
+| Упаковка | Compose `nativeDistributions` → `createDistributable` (jpackage app-image); runtime — явный список `modules(...)`, без `includeAllModules` и без `jdk.jlink`/`jdk.jpackage` (Temurin 25 без `jmods`, JEP 493; CLR-004) | — | — | ADR-001 |
 
 Добавлять зависимости, не перечисленные в этой таблице или в задаче, **запрещено**. `kotlinx-coroutines` приходит
 транзитивно через Compose — в своём коде его **не использовать**.
@@ -42,7 +42,7 @@ fast-cow-screenshot/
 │   ├── libs.versions.toml
 │   └── wrapper/ (gradle-wrapper.jar, gradle-wrapper.properties)
 ├── src/
-│   ├── main/kotlin/by/sparkyanvil/fastcow/
+│   ├── main/kotlin/by/sparkyanvil/fastcowscreenshot/
 │   │   ├── Main.kt                 # точка входа main()
 │   │   ├── app/                    # сборка зависимостей, жизненный цикл, потоки
 │   │   ├── domain/                 # чистая логика: геометрия, имена файлов, модели
@@ -53,23 +53,23 @@ fast-cow-screenshot/
 │   │   │   └── jna/                # JNA-интерфейсы, структуры, константы
 │   │   └── ui/                     # трей, уведомление, оверлей, окно настроек, «Сохранить как»
 │   ├── main/resources/logback.xml
-│   └── test/kotlin/by/sparkyanvil/fastcow/   # зеркально main
+│   └── test/kotlin/by/sparkyanvil/fastcowscreenshot/   # зеркально main
 └── docs/
 ```
 
-Базовый пакет: **`by.sparkyanvil.fastcow`**. Путь: `src/main/kotlin/by/sparkyanvil/fastcow/`.
+Базовый пакет: **`by.sparkyanvil.fastcowscreenshot`**. Путь: `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/`.
 
 ## 3. Пакеты и слои
 
 | Пакет | Ответственность | Может зависеть от | Не может зависеть от |
 |---|---|---|---|
-| `…fastcow.domain` | Геометрия, имена файлов, значения | только JDK (`java.time`, `java.nio.file`) | `java.awt.*` (кроме `java.awt.image.BufferedImage`), `javax.swing`, `com.sun.jna`, `androidx.compose` |
-| `…fastcow.settings` | `AppSettings`, `HotkeyBinding`, хранилище JSON | `domain`, kotlinx.serialization | `platform`, `ui`, `com.sun.jna` |
-| `…fastcow.capture` | Интерфейсы (`ScreenCapturer`, `ClipboardWriter`…), `CaptureCoordinator` | `domain`, `settings`, `storage` (интерфейсы) | `platform`, `ui`, `com.sun.jna`, `javax.swing` |
-| `…fastcow.storage` | Запись PNG, автосохранение | `domain`, `javax.imageio` | `platform`, `ui`, `com.sun.jna` |
-| `…fastcow.platform.windows` (+ `.jna`) | Реализации интерфейсов на WinAPI | `domain`, `capture`, `settings`, JNA | `ui` |
-| `…fastcow.ui` | Окна, трей, диалоги | все пакеты выше, Compose, Swing/AWT | — |
-| `…fastcow.app` | Сборка графа объектов, потоки, выход | все | — |
+| `…fastcowscreenshot.domain` | Геометрия, имена файлов, значения | только JDK (`java.time`, `java.nio.file`) | `java.awt.*` (кроме `java.awt.image.BufferedImage`), `javax.swing`, `com.sun.jna`, `androidx.compose` |
+| `…fastcowscreenshot.settings` | `AppSettings`, `HotkeyBinding`, хранилище JSON | `domain`, kotlinx.serialization | `platform`, `ui`, `com.sun.jna` |
+| `…fastcowscreenshot.capture` | Интерфейсы (`ScreenCapturer`, `ClipboardWriter`…), `CaptureCoordinator` | `domain`, `settings`, `storage` (интерфейсы) | `platform`, `ui`, `com.sun.jna`, `javax.swing` |
+| `…fastcowscreenshot.storage` | Запись PNG, автосохранение | `domain`, `javax.imageio` | `platform`, `ui`, `com.sun.jna` |
+| `…fastcowscreenshot.platform.windows` (+ `.jna`) | Реализации интерфейсов на WinAPI | `domain`, `capture`, `settings`, JNA | `ui` |
+| `…fastcowscreenshot.ui` | Окна, трей, диалоги | все пакеты выше, Compose, Swing/AWT | — |
+| `…fastcowscreenshot.app` | Сборка графа объектов, потоки, выход | все | — |
 
 Правила:
 - Любой вызов `com.sun.jna.*` — только в `platform.windows` и `platform.windows.jna`. Исключение — `ui` получает HWND окна
@@ -82,7 +82,7 @@ fast-cow-screenshot/
 |---|---|---|
 | Сборка + тесты | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 | Только тесты | `.\gradlew.bat test` | `BUILD SUCCESSFUL`, 0 failed |
-| Один тест | `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.domain.PixelRectTest"` | Тесты класса проходят |
+| Один тест | `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.domain.PixelRectTest"` | Тесты класса проходят |
 | Компиляция | `.\gradlew.bat compileKotlin compileTestKotlin` | `BUILD SUCCESSFUL` |
 | Запуск приложения | `.\gradlew.bat run` | Приложение запущено, значок в трее; закрыть через «Выход» в трее. Запускать с таймаутом, если запускает агент |
 | Дистрибутив | `.\gradlew.bat createDistributable` | `build\compose\binaries\main\app\fast-cow-screenshot\fast-cow-screenshot.exe` |
@@ -137,7 +137,7 @@ fast-cow-screenshot/
 - Библиотека: JNA 5.19.1. Свои интерфейсы загружаются так:
   `Native.load("user32", User32Api::class.java, W32APIOptions.DEFAULT_OPTIONS)`. `DEFAULT_OPTIONS` сам выбирает
   `…W`-версии функций, поэтому в интерфейсе функции объявляются **без** суффикса `W` (`GetMonitorInfo`, `MessageBox`).
-- Где лежат маппинги: `by.sparkyanvil.fastcow.platform.windows.jna` (TASK-005). Новые функции добавляются только
+- Где лежат маппинги: `by.sparkyanvil.fastcowscreenshot.platform.windows.jna` (TASK-005). Новые функции добавляются только
   туда и только задачей.
 - Типы из `jna-platform` (`WinDef.HWND`, `WinDef.HDC`, `WinDef.RECT`, `WinDef.POINT`, `WinUser.MSG`,
   `WinUser.MONITORINFOEX`, `WinGDI.BITMAPINFO`, `WinGDI.ICONINFO`) использовать разрешено.
@@ -147,7 +147,8 @@ fast-cow-screenshot/
   `DpiAwareness.enterPerMonitorV2()` (TASK-005). Все координаты в `domain`, `capture` и `platform` — **физические пиксели
   виртуального рабочего стола**.
 - Флаги JVM (заданы в `build.gradle.kts`, TASK-001): `--enable-native-access=ALL-UNNAMED`,
-  `--sun-misc-unsafe-memory-access=allow`, `-Xmx768m`.
+  `--sun-misc-unsafe-memory-access=allow`, `-Xmx768m`; для возврата памяти ОС в простое (REQ-001.N6, TASK-019, CLR-005) —
+  `-XX:G1PeriodicGCInterval=15000`, `-XX:MinHeapFreeRatio=10`, `-XX:MaxHeapFreeRatio=20`.
 
 ## 8. Логирование
 
@@ -171,6 +172,14 @@ fast-cow-screenshot/
   разрешённое использование `lateinit`.
 - Unit-тестами покрываются: `domain`, `settings`, `storage`, `capture` (с фейками), чистые функции `platform`
   (`DibEncoder`, `HotkeyBinding`).
+- MockK на JDK 25: агент ByteBuddy подключается к тестовой JVM через `-javaagent:<byte-buddy-agent.jar>` и
+  `-Xshare:off` в `doFirst` блока `tasks.test` `build.gradle.kts` (TASK-004, CLR-001, CLR-002). Self-attach
+  (`-Djdk.attach.allowAttachSelf=true`) не использовать: он ломается на путях с кириллицей. В `appJvmArgs` эти
+  флаги не добавлять. Ошибки `Could not self-attach to current VM` или `Error opening zip file` в тестах с MockK
+  означают, что блок `tasks.test` не соответствует TASK-004 шаг 0.
+- Compose-события клавиатуры: `KeyEvent.nativeKeyEvent` **не** приводить к `java.awt.event.KeyEvent` (в Compose 1.12.2
+  это `InternalKeyEvent`). Код клавиши — `e.key.nativeKeyCode` (AWT `VK_*`), модификаторы — `e.isCtrlPressed`,
+  `e.isAltPressed`, `e.isShiftPressed` (CLR-003). Решение по нажатию выносить в чистую функцию с unit-тестами.
 - Тесты с реальным WinAPI помечаются `@EnabledOnOs(OS.WINDOWS)` и не требуют действий пользователя.
 - Реальный захват на нескольких мониторах, HiDPI, горячие клавиши, трей и вставку из буфера проверяет пользователь
   по шагам раздела «Проверка» задачи.
@@ -199,3 +208,7 @@ fast-cow-screenshot/
 | Дата | Изменение | ADR / TASK |
 |---|---|---|
 | 2026-10-18 | Первая версия | ADR-001, ADR-002, ADR-003 |
+| 2026-10-29 | §9: агент MockK через `-javaagent` в тестовой JVM | CLR-001, CLR-002, TASK-004 |
+| 2026-10-31 | §9: правило для Compose-событий клавиатуры | CLR-003, TASK-017 |
+| 2026-10-31 | §1: runtime дистрибутива — явный список модулей (Temurin 25 без jmods) | CLR-004, TASK-018 |
+| 2026-10-31 | §7: флаги G1 для возврата памяти ОС | CLR-005, TASK-019 |

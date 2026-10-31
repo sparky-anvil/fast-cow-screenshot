@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
@@ -63,7 +63,7 @@
 
 ## 4. Область изменений
 
-`S = src/main/kotlin/by/sparkyanvil/fastcow/storage/`, `TS` — то же в `src/test/kotlin`.
+`S = src/main/kotlin/by/sparkyanvil/fastcowscreenshot/storage/`, `TS` — то же в `src/test/kotlin`.
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
@@ -73,9 +73,9 @@
 | 4 | `S/AutoSaver.kt` | Создать | класс |
 | 5 | `S/IoErrorMessages.kt` | Создать | object |
 | 6 | `S/DirectoryValidator.kt` | Создать | object |
-| 7 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/KnownFolders.kt` | Создать | класс |
+| 7 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/KnownFolders.kt` | Создать | класс |
 | 8 | `TS/PngFileWriterTest.kt`, `TS/AutoSaverTest.kt`, `TS/IoErrorMessagesTest.kt`, `TS/DirectoryValidatorTest.kt` | Создать | unit |
-| 9 | `src/test/kotlin/by/sparkyanvil/fastcow/platform/windows/KnownFoldersTest.kt` | Создать | integration |
+| 9 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/KnownFoldersTest.kt` | Создать | integration |
 
 **Файлы, которые изменять нельзя:** все, кроме перечисленных.
 
@@ -86,7 +86,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.storage
+package by.sparkyanvil.fastcowscreenshot.storage
 
 /** Результат сохранения. reason — текст для пользователя (на русском). */
 internal sealed interface SaveResult {
@@ -134,7 +134,7 @@ internal object DirectoryValidator {
 ```
 
 ```kotlin
-package by.sparkyanvil.fastcow.platform.windows
+package by.sparkyanvil.fastcowscreenshot.platform.windows
 
 /** Начальная директория по умолчанию (REQ-001.44). Вызывать с любого потока. */
 internal class KnownFolders : DefaultDirectoryProvider {
@@ -241,8 +241,8 @@ try {
 
 | Команда | Ожидаемый результат |
 |---|---|
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.storage.*"` | 11 тестов |
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.platform.windows.KnownFoldersTest"` | 1 тест |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.storage.*"` | 11 тестов |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.platform.windows.KnownFoldersTest"` | 1 тест |
 | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 
 **Ручная** (пользователь): в журнал записать путь, который вернул тест 12 (вывести в лог `INFO` в тесте). Он должен
@@ -250,10 +250,10 @@ try {
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–5 выполнены; контракты — как в разделе 6.
-- [ ] Ни в одной ветке ошибки не остаётся `*.tmp`.
-- [ ] 12 тестов проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Шаги 1–5 выполнены; контракты — как в разделе 6.
+- [x] Ни в одной ветке ошибки не остаётся `*.tmp`.
+- [x] 12 тестов проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -276,4 +276,4 @@ try {
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-29 | Review | Реализованы SaveResult, ScreenshotSaver, PngFileWriter, AutoSaver, IoErrorMessages, DirectoryValidator, KnownFolders и 12 тестов (storage - 11, KnownFolders - 1), все пройдены; ``gradlew build`` - BUILD SUCCESSFUL. Ручная проверка: KnownFolders вернул ``C:\Users\<пользователь>\Pictures\Screenshots``, пользователь подтвердил совпадение с папкой Win+PrtSc. TASK-003 по решению пользователя переведена в Done. Отклонений нет. |

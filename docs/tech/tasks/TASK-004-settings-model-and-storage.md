@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
@@ -51,12 +51,12 @@
 
 ## 3. Предусловия
 
-- TASK-002 выполнена: есть `by.sparkyanvil.fastcow.domain.CaptureMode`.
+- TASK-002 выполнена: есть `by.sparkyanvil.fastcowscreenshot.domain.CaptureMode`.
 - `.\gradlew.bat build` → `BUILD SUCCESSFUL`.
 
 ## 4. Область изменений
 
-`M = src/main/kotlin/by/sparkyanvil/fastcow/settings/`, `T = src/test/kotlin/by/sparkyanvil/fastcow/settings/`.
+`M = src/main/kotlin/by/sparkyanvil/fastcowscreenshot/settings/`, `T = src/test/kotlin/by/sparkyanvil/fastcowscreenshot/settings/`.
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
@@ -68,17 +68,19 @@
 | 6 | `M/SettingsRepository.kt` | Создать | чтение/запись |
 | 7 | `M/SettingsStore.kt` | Создать | значение в памяти |
 | 8 | `T/HotkeyBindingTest.kt`, `T/SettingsRepositoryTest.kt`, `T/SettingsStoreTest.kt` | Создать | тесты |
+| 9 | `build.gradle.kts` (корень) | Изменить | только блок `tasks.test { }`: добавить флаги JVM для MockK (шаг 0, CLR-001) |
 
-**Файлы, которые изменять нельзя:** все, кроме перечисленных.
+**Файлы, которые изменять нельзя:** все, кроме перечисленных. В `build.gradle.kts` нельзя менять ничего, кроме блока
+`tasks.test { }`; список `appJvmArgs` не трогать (он же используется для запуска приложения).
 
 ## 5. Зависимости
 
-Новых нет (`kotlinx-serialization-json` и плагин serialization подключены в TASK-001).
+Новых нет (`kotlinx-serialization-json` и плагин serialization подключены в TASK-001). Флаги тестовой JVM — шаг 0.
 
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.settings
+package by.sparkyanvil.fastcowscreenshot.settings
 
 /** Действие горячей клавиши. displayName — текст для UI. */
 internal enum class HotkeyAction(val displayName: String, val mode: CaptureMode) {
@@ -178,10 +180,28 @@ internal class SettingsStore(private val repository: SettingsRepository) {
 }
 ```
 
-Импорт `CaptureMode`: `by.sparkyanvil.fastcow.domain.CaptureMode`. `@Serializable` — `kotlinx.serialization.Serializable`.
+Импорт `CaptureMode`: `by.sparkyanvil.fastcowscreenshot.domain.CaptureMode`. `@Serializable` — `kotlinx.serialization.Serializable`.
 
 ## 7. Пошаговая реализация
 
+0. `build.gradle.kts`: блок `tasks.test` заменить целиком на эталонный фрагмент (CLR-001, CLR-002). Строку
+   `jvmArgs("-Djdk.attach.allowAttachSelf=true", "-XX:+EnableDynamicAgentLoading")`, если она уже есть, удалить.
+   ```kotlin
+   tasks.test {
+       useJUnitPlatform()
+       jvmArgs(appJvmArgs)
+       // MockK: агент ByteBuddy подключается при старте JVM (-javaagent), а не self-attach,
+       // который на JDK 25 не работает и ломается на путях с кириллицей (CLR-001, CLR-002).
+       doFirst {
+           val agentJar = classpath.first { it.name.startsWith("byte-buddy-agent") }
+           jvmArgs("-javaagent:${agentJar.absolutePath}", "-Xshare:off")
+       }
+   }
+   ```
+   `byte-buddy-agent` приходит в тестовый classpath транзитивно через `io.mockk:mockk` — новую зависимость
+   не добавлять. `-Xshare:off` убирает предупреждение JVM `Sharing is only supported for boot loader classes`.
+   Результат: `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.settings.SettingsStoreTest"` → 3 теста
+   пройдены (проверено Tech на машине с профилем `C:\Users\Александр`).
 1. `HotkeyAction.kt`, `HotkeyBinding.kt` — по разделам 6 и 8. Компиляция проходит.
 2. `HotkeySettings.kt`, `AppSettings.kt`, `DefaultDirectoryProvider.kt`.
 3. `SettingsRepository.kt`: `private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; prettyPrint = true }`.
@@ -259,15 +279,15 @@ internal class SettingsStore(private val repository: SettingsRepository) {
 
 | Команда | Ожидаемый результат |
 |---|---|
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.settings.*"` | 16 тестов пройдены |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.settings.*"` | 16 тестов пройдены |
 | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–5 выполнены; сигнатуры — как в разделе 6.
-- [ ] Все случаи раздела 9 обработаны.
-- [ ] 16 тестов проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Шаги 0–5 выполнены; сигнатуры — как в разделе 6.
+- [x] Все случаи раздела 9 обработаны.
+- [x] 16 тестов проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -278,7 +298,10 @@ internal class SettingsStore(private val repository: SettingsRepository) {
 ## 15. Ловушки и подсказки
 
 - `encodeDefaults = true` нужен, чтобы в файл попадали все поля, включая значения по умолчанию.
-- `SettingsRepository` — обычный (не `open`) класс. MockK мокает final-классы без настроек.
+- `SettingsRepository` — обычный (не `open`) класс. MockK мокает final-классы через inline-агент ByteBuddy, который
+  на JDK 25 надёжно работает только при подключении через `-javaagent` (шаг 0). Без него тест №16 падает с
+  `Could not self-attach to current VM`, а с флагом `-Djdk.attach.allowAttachSelf=true` — с
+  `Error opening zip file or JAR manifest missing` (кириллица в пути `~\.gradle`). Флаги self-attach не использовать.
 - `SerializationException` — `kotlinx.serialization.SerializationException`. `MissingFieldException` — его подкласс.
 - `Files.move(..., ATOMIC_MOVE)` с `REPLACE_EXISTING` на NTFS атомарно заменяет файл.
 
@@ -288,4 +311,9 @@ internal class SettingsStore(private val repository: SettingsRepository) {
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-29 | In Progress | Начата реализация. |
+| 2026-10-29 | Blocked | Шаги 1–5 выполнены, 48 из 49 тестов проходят. Тест №16 (MockK) падает: self-attach на JDK 25 → CLR-001 (Tech). |
+| 2026-10-29 | In Progress | CLR-001 закрыт: флаги из шага 0 добавлены в tasks.test. |
+| 2026-10-29 | Blocked | Тест №16 всё равно падает: агент не открывается из-за кириллицы в пути ~/.gradle (48/49 тестов зелёные) → CLR-002 (Tech). |
+| 2026-10-29 | In Progress | CLR-002 закрыт, возобновлено. |
+| 2026-10-29 | Review | Шаг 0 применён (-javaagent). `.\gradlew.bat build` — SUCCESS, 16 тестов settings (7+6+3), 0 failed. Ручных проверок нет. Отклонений нет. |

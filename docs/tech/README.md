@@ -1,4 +1,4 @@
-# Техническая документация проекта fast-cow-screenshot
+﻿# Техническая документация проекта fast-cow-screenshot
 
 Рабочее пространство агентов **Tech** (`.kilo/agent/tech.md`) и **Dev** (`.kilo/agent/dev.md`).
 
@@ -34,28 +34,31 @@
 
 | ID | Название | TDD | Зависит от | Оценка | Статус |
 |---|---|---|---|---|---|
-| [TASK-001](tasks/TASK-001-gradle-project-skeleton.md) | Каркас Gradle-проекта | TDD-001 | — | M | Ready |
-| [TASK-002](tasks/TASK-002-domain-geometry.md) | Доменная геометрия и модели | TDD-001 | 001 | M | Ready |
-| [TASK-003](tasks/TASK-003-file-names.md) | Имена файлов, `.png`, сокращение пути | TDD-001 | 001 | S | Ready |
-| [TASK-004](tasks/TASK-004-settings-model-and-storage.md) | Модель настроек и JSON-хранилище | TDD-001 | 002 | M | Ready |
-| [TASK-005](tasks/TASK-005-jna-winapi-mappings.md) | JNA-маппинги WinAPI, DPI, HWND | TDD-001 | 001 | L | Ready |
-| [TASK-006](tasks/TASK-006-monitors-gdi-capture-cursor.md) | Мониторы, GDI-захват, указатель | TDD-001 | 002, 005 | L | Ready |
-| [TASK-007](tasks/TASK-007-message-loop-hotkeys.md) | Цикл сообщений и горячие клавиши | TDD-001 | 004, 005 | M | Ready |
-| [TASK-008](tasks/TASK-008-clipboard-writer.md) | Буфер обмена CF_DIB | TDD-001 | 005, 006, 007 | M | Ready |
-| [TASK-009](tasks/TASK-009-png-autosave-known-folders.md) | Автосохранение PNG и Known Folders | TDD-001 | 003, 004, 005 | M | Ready |
-| [TASK-010](tasks/TASK-010-capture-coordinator.md) | Координатор захвата и потоки | TDD-001 | 006, 008, 009 | L | Ready |
-| [TASK-011](tasks/TASK-011-notification-window.md) | Окно уведомлений | TDD-001 | 003, 005, 010 | M | Ready |
-| [TASK-012](tasks/TASK-012-save-as.md) | «Сохранить как…» | TDD-001 | 003, 004, 005, 009, 010 | M | Ready |
-| [TASK-013](tasks/TASK-013-region-overlay.md) | Оверлей выделения области | TDD-001 | 002, 005, 010 | L | Ready |
-| [TASK-014](tasks/TASK-014-settings-window.md) | Окно настроек | TDD-001 | 004, 005, 007, 009, 010, 011 | L | Ready |
-| [TASK-015](tasks/TASK-015-tray-app-wiring.md) | Трей, сборка приложения, приёмка | TDD-001 | 011, 012, 013, 014 | M | Ready |
-| [TASK-016](tasks/TASK-016-distribution-and-nfr.md) | Дистрибутив app-image и замеры NFR | TDD-001 | 015 | S | Ready |
+| [TASK-001](tasks/TASK-001-gradle-project-skeleton.md) | Каркас Gradle-проекта | TDD-001 | — | M | Done |
+| [TASK-002](tasks/TASK-002-domain-geometry.md) | Доменная геометрия и модели | TDD-001 | 001 | M | Done |
+| [TASK-003](tasks/TASK-003-file-names.md) | Имена файлов, `.png`, сокращение пути | TDD-001 | 001 | S | Done |
+| [TASK-004](tasks/TASK-004-settings-model-and-storage.md) | Модель настроек и JSON-хранилище | TDD-001 | 002 | M | Done |
+| [TASK-005](tasks/TASK-005-jna-winapi-mappings.md) | JNA-маппинги WinAPI, DPI, HWND | TDD-001 | 001 | L | Done |
+| [TASK-006](tasks/TASK-006-monitors-gdi-capture-cursor.md) | Мониторы, GDI-захват, указатель | TDD-001 | 002, 005 | L | Done |
+| [TASK-007](tasks/TASK-007-message-loop-hotkeys.md) | Цикл сообщений и горячие клавиши | TDD-001 | 004, 005 | M | Done |
+| [TASK-008](tasks/TASK-008-clipboard-writer.md) | Буфер обмена CF_DIB | TDD-001 | 005, 006, 007 | M | Done |
+| [TASK-009](tasks/TASK-009-png-autosave-known-folders.md) | Автосохранение PNG и Known Folders | TDD-001 | 003, 004, 005 | M | Done |
+| [TASK-010](tasks/TASK-010-capture-coordinator.md) | Координатор захвата и потоки | TDD-001 | 006, 008, 009 | L | Done |
+| [TASK-011](tasks/TASK-011-notification-window.md) | Окно уведомлений | TDD-001 | 003, 005, 010 | M | Done |
+| [TASK-012](tasks/TASK-012-save-as.md) | «Сохранить как…» | TDD-001 | 003, 004, 005, 009, 010 | M | Done |
+| [TASK-013](tasks/TASK-013-region-overlay.md) | Оверлей выделения области | TDD-001 | 002, 005, 010 | L | Done |
+| [TASK-014](tasks/TASK-014-settings-window.md) | Окно настроек | TDD-001 | 004, 005, 007, 009, 010, 011 | L | Done |
+| [TASK-015](tasks/TASK-015-tray-app-wiring.md) | Трей, сборка приложения, приёмка | TDD-001 | 011, 012, 013, 014, 017 | M | Done |
+| [TASK-016](tasks/TASK-016-distribution-and-nfr.md) | Дистрибутив app-image и замеры NFR | TDD-001 | 015, 018, 019 | S | Done |
+| [TASK-017](tasks/TASK-017-fix-hotkey-recording.md) | Исправление записи сочетания клавиш (CLR-003) | TDD-001 | 014 | S | Done |
+| [TASK-018](tasks/TASK-018-runtime-modules-list.md) | Явный список модулей runtime (CLR-004) | TDD-001 | 015 | S | Done |
+| [TASK-019](tasks/TASK-019-jvm-heap-uncommit.md) | Флаги G1 для возврата памяти ОС, замер RSS (CLR-005) | TDD-001 | 018 | S | Done |
 
 ## Порядок выполнения
 
 Задачи выполняются сверху вниз; задача берётся в работу, только когда все её зависимости в статусе `Done`.
 
-TASK-001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 011 → 012 → 013 → 014 → 015 → 016.
+TASK-001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 011 → 012 → 013 → 014 → 017 → 015 → 018 → 019 → 016.
 TASK-002/003/005 и TASK-011/012/013 между собой независимы.
 
 ## Запросы уточнения
@@ -64,3 +67,13 @@ TASK-002/003/005 и TASK-011/012/013 между собой независимы.
 
 | ID | Вопрос | Задача | Адресат | Блокирует | Статус |
 |---|---|---|---|---|---|
+| [CLR-001](clarifications/CLR-001-mockk-self-attach-jdk25.md) | MockK self-attach на JDK 25: нужен флаг в tasks.test | TASK-004 | Tech | Да | Closed |
+| [CLR-002](clarifications/CLR-002-mockk-agent-cyrillic-path.md) | Self-attach MockK падает из-за кириллицы в пути к Gradle-кэшу | TASK-004 | Tech | Да | Closed |
+| [CLR-003](clarifications/CLR-003-compose-native-key-event-cast.md) | ClassCastException nativeKeyEvent в окне настроек (шаг 26 приёмки) | TASK-015 (дефект TASK-014) | Tech | Да | Closed |
+| [CLR-004](clarifications/CLR-004-jlink-no-jmods-temurin25.md) | createDistributable: Temurin 25 без jmods, jlink падает | TASK-016 | Tech | Да | Closed |
+| [CLR-005](clarifications/CLR-005-rss-over-200mb-after-captures.md) | RSS 438–646 МБ после снимков (N6 ≤ 200); неэталонная конфигурация замеров | TASK-016 | Tech | Да | Closed |
+| [CLR-006](clarifications/CLR-006-n6-rss-definition.md) | N6: «в простое» — до или после снимков (RSS 266–271 МБ при heap 38 МБ) | TASK-019 | Tech | Да | Closed |
+
+
+
+

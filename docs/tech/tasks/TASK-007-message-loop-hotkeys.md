@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
@@ -44,7 +44,7 @@
 
 ## 3. Предусловия
 
-- TASK-004: `HotkeyAction`, `HotkeyBinding` (`winModifiers`, `keyCode`, `format()`) в `…fastcow.settings`.
+- TASK-004: `HotkeyAction`, `HotkeyBinding` (`winModifiers`, `keyCode`, `format()`) в `…fastcowscreenshot.settings`.
 - TASK-005: `User32Api`, `Kernel32Api`, `WinConst`, `WinApiException` в `…platform.windows(.jna)`.
 - `.\gradlew.bat build` → `BUILD SUCCESSFUL`.
 
@@ -52,11 +52,11 @@
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
-| 1 | `src/main/kotlin/by/sparkyanvil/fastcow/capture/HotkeyService.kt` | Создать | интерфейс |
-| 2 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/NativeMessageLoop.kt` | Создать | класс |
-| 3 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/WindowsHotkeyService.kt` | Создать | класс |
-| 4 | `src/test/kotlin/by/sparkyanvil/fastcow/platform/windows/NativeMessageLoopTest.kt` | Создать | тесты |
-| 5 | `src/test/kotlin/by/sparkyanvil/fastcow/platform/windows/WindowsHotkeyServiceTest.kt` | Создать | тесты |
+| 1 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/capture/HotkeyService.kt` | Создать | интерфейс |
+| 2 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/NativeMessageLoop.kt` | Создать | класс |
+| 3 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/WindowsHotkeyService.kt` | Создать | класс |
+| 4 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/NativeMessageLoopTest.kt` | Создать | тесты |
+| 5 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/WindowsHotkeyServiceTest.kt` | Создать | тесты |
 
 **Файлы, которые изменять нельзя:** все, кроме перечисленных.
 
@@ -67,7 +67,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.capture
+package by.sparkyanvil.fastcowscreenshot.capture
 
 /** Глобальные горячие клавиши. Потокобезопасен. */
 internal interface HotkeyService {
@@ -84,7 +84,7 @@ internal interface HotkeyService {
 ```
 
 ```kotlin
-package by.sparkyanvil.fastcow.platform.windows
+package by.sparkyanvil.fastcowscreenshot.platform.windows
 
 /** Поток fcs-hotkeys с циклом GetMessageW. Потокобезопасен. */
 internal class NativeMessageLoop(
@@ -212,18 +212,18 @@ internal class WindowsHotkeyService(
 
 | Команда | Ожидаемый результат |
 |---|---|
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.platform.windows.NativeMessageLoopTest"` | 4 теста |
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.platform.windows.WindowsHotkeyServiceTest"` | 3 теста |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.platform.windows.NativeMessageLoopTest"` | 4 теста |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.platform.windows.WindowsHotkeyServiceTest"` | 3 теста |
 | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 
 Ручная проверка нажатий — в TASK-015.
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–3 выполнены; контракты — как в разделе 6.
-- [ ] `RegisterHotKey`/`UnregisterHotKey` вызываются только на `fcs-hotkeys`.
-- [ ] 7 тестов проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Шаги 1–3 выполнены; контракты — как в разделе 6.
+- [x] `RegisterHotKey`/`UnregisterHotKey` вызываются только на `fcs-hotkeys`.
+- [x] 7 тестов проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -244,4 +244,4 @@ internal class WindowsHotkeyService(
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-29 | Review | Реализованы HotkeyService, NativeMessageLoop, WindowsHotkeyService и 7 тестов (4 + 3), все пройдены; `gradlew build` - BUILD SUCCESSFUL. По указанию пользователя перед началом TASK-006 и TASK-004 переведены в Done. Отклонений нет. Ручная проверка нажатий - в TASK-015. |

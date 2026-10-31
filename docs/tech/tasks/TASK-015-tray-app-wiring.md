@@ -2,13 +2,13 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
 | Требования | REQ-001.1–.3, .37, .42, N9, N11; US-001 – US-007 (приёмка) |
 | ADR | ADR-001, ADR-002 |
-| Зависит от | TASK-011, TASK-012, TASK-013, TASK-014 |
+| Зависит от | TASK-011, TASK-012, TASK-013, TASK-014, TASK-017 |
 | Блокирует | TASK-016 |
 
 > Перед началом прочитай `docs/tech/conventions.md`. Всё, что не сказано в этой задаче, делается по соглашениям оттуда.
@@ -16,7 +16,7 @@
 
 ## 1. Цель
 
-Связать все компоненты в работающее приложение `FastCowApp`:
+Связать все компоненты в работающее приложение `FastCowScreenshotApp`:
 - значок и меню в трее;
 - регистрация горячих клавиш с уведомлением о конфликтах;
 - корректный выход.
@@ -25,9 +25,9 @@
 
 ## 2. Контекст
 
-- `main()` создаёт `FastCowApp` и вызывает `start()`. После возврата из `main` JVM продолжает работать: значок в трее
+- `main()` создаёт `FastCowScreenshotApp` и вызывает `start()`. После возврата из `main` JVM продолжает работать: значок в трее
   держит живыми потоки AWT. Завершение — только через пункт «Выход» → `System.exit(0)`.
-- Компоненты и потоки — TDD-001 §4, `conventions.md` §6. Свойства `FastCowApp` инициализируются в порядке объявления.
+- Компоненты и потоки — TDD-001 §4, `conventions.md` §6. Свойства `FastCowScreenshotApp` инициализируются в порядке объявления.
   Лямбда `onSaveAs` в `NotificationWindow` ссылается на объявленное ниже свойство `saveAsAction`. Это допустимо:
   лямбда вызывается позже, когда все свойства уже инициализированы.
 - Меню трея — AWT `PopupMenu` (нативное меню Windows). Значок рисуется программно (`TrayIconImage`) — бинарных
@@ -55,11 +55,11 @@
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
-| 1 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/TrayIconImage.kt` | Создать | object |
-| 2 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/TrayController.kt` | Создать | класс |
-| 3 | `src/main/kotlin/by/sparkyanvil/fastcow/app/FastCowApp.kt` | Создать | класс |
-| 4 | `src/main/kotlin/by/sparkyanvil/fastcow/Main.kt` | Изменить | тело `main()` |
-| 5 | `src/test/kotlin/by/sparkyanvil/fastcow/app/HotkeyConflictMessageTest.kt` | Создать | unit |
+| 1 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/TrayIconImage.kt` | Создать | object |
+| 2 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/TrayController.kt` | Создать | класс |
+| 3 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/app/FastCowScreenshotApp.kt` | Создать | класс |
+| 4 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/Main.kt` | Изменить | тело `main()` |
+| 5 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/app/HotkeyConflictMessageTest.kt` | Создать | unit |
 
 **Файлы, которые изменять нельзя:** все, кроме перечисленных.
 
@@ -70,7 +70,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.ui
+package by.sparkyanvil.fastcowscreenshot.ui
 
 internal object TrayIconImage {
     /** 32×32 TYPE_INT_ARGB: скруглённый квадрат #2E86DE (радиус 8), белая буква "F", шрифт Font.SANS_SERIF BOLD 22, по центру. */
@@ -97,9 +97,9 @@ internal class TrayController(
 ```
 
 ```kotlin
-package by.sparkyanvil.fastcow.app
+package by.sparkyanvil.fastcowscreenshot.app
 
-internal class FastCowApp {
+internal class FastCowScreenshotApp {
     /** Запуск (раздел 8.2). Вызывать на main-потоке. */
     fun start(): Unit = TODO()
     /** Выход (раздел 8.3). Вызывать на EDT. */
@@ -116,9 +116,9 @@ internal class FastCowApp {
 ## 7. Пошаговая реализация
 
 1. `TrayIconImage`, `TrayController` (8.1).
-2. `FastCowApp` (8.2, 8.3) + `HotkeyConflictMessageTest`.
+2. `FastCowScreenshotApp` (8.2, 8.3) + `HotkeyConflictMessageTest`.
 3. `Main.kt`: `Thread.setDefaultUncaughtExceptionHandler { t, e -> log.error("Uncaught exception in {}", t.name, e) }`;
-   прежняя строка лога запуска; `FastCowApp().start()`.
+   прежняя строка лога запуска; `FastCowScreenshotApp().start()`.
 4. `.\gradlew.bat build`, затем ручная приёмка раздела 12.
 
 ## 8. Алгоритм и логика
@@ -136,7 +136,7 @@ SystemTray.getSystemTray().add(icon)
 lastScreenshot.addListener { saveAs.isEnabled = true }   // слушатель уже вызывается на EDT
 ```
 
-### 8.2. FastCowApp: свойства и start()
+### 8.2. FastCowScreenshotApp: свойства и start()
 
 Свойства (в этом порядке):
 ```
@@ -244,17 +244,23 @@ tray = TrayController(last, { saveAsAction.run() }, { settingsWindow.show() }, {
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–4 выполнены; контракты — как в разделе 6.
-- [ ] `.\gradlew.bat build` → `BUILD SUCCESSFUL`.
-- [ ] Результаты ручных шагов 1–31 записаны в журнал. Каждый провал оформлен CLR к Tech с номером шага и логом
+- [x] Шаги 1–4 выполнены; контракты — как в разделе 6.
+- [x] `.\gradlew.bat build` → `BUILD SUCCESSFUL`.
+- [x] Результаты ручных шагов 1–31 записаны в журнал. Каждый провал оформлен CLR к Tech с номером шага и логом
       `%LOCALAPPDATA%\fast-cow-screenshot\logs\app.log`.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
 - Не исправлять найденные при приёмке ошибки в файлах других задач без CLR.
 - Не добавлять автозапуск, запрет второго экземпляра, пункты меню сверх раздела 10.
 - Не использовать Compose `Tray`/`application {}`.
+- Не менять `ui/SettingsWindow.kt`: запись сочетаний исправляется в TASK-017 (CLR-003).
+- Пункт «Выход» меню трея при ПКМ частично перекрывается панелью задач — известное ограничение AWT `PopupMenu`
+  (TDD-001 §15), не дефект; CLR по нему не оформлять, в журнале отметить «известное ограничение».
+
+**Возобновление после CLR-003:** код шагов 1–4 уже написан (см. журнал), повторно не писать. После `Done` у TASK-017:
+`.\gradlew.bat build`, затем ручные шаги 26 и 28–31 раздела 12 (шаги 1–25, 27 уже пройдены), затем `Review`.
 
 ## 15. Ловушки и подсказки
 
@@ -269,4 +275,6 @@ tray = TrayController(last, { saveAsAction.run() }, { settingsWindow.show() }, {
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-31 | Blocked | Шаги 1–4 выполнены, `.\gradlew.bat build` успешен, `HotkeyConflictMessageTest` проходит. Для `notifier` и `saveAsAction` добавлены явные типы (рекурсивный вывод типов). Приёмка: шаги 1–25, 27 — пользователь: «Работает» (замечание к шагу 1: пункт «Выход» в меню трея при ПКМ скрывается за панелью задач — AWT PopupMenu, вне задачи); шаг 26 не проходит: ClassCastException в SettingsWindow.kt:107 → [CLR-003](../clarifications/CLR-003-compose-native-key-event-cast.md) (Tech). Шаги 28–31 не выполнялись. |
+| 2026-10-31 | In Progress | CLR-003 закрыт, TASK-017 в Done; возобновлена. |
+| 2026-10-31 | Review | `.\gradlew.bat build` успешен. Ручная приёмка (пользователь): шаги 1–25, 27 — «Работает»; после TASK-017 шаги 26, 28–31 — «Работает как описано». Известное ограничение: пункт «Выход» меню трея частично за панелью задач (AWT PopupMenu), не дефект. Отклонение: явные типы у `notifier` и `saveAsAction` (рекурсивный вывод типов). |

@@ -1,8 +1,8 @@
-# TASK-011: Реализовать окно уведомлений (3 с, замена, «Сохранить как…», открыть папку с файлом)
+﻿# TASK-011: Реализовать окно уведомлений (3 с, замена, «Сохранить как…», открыть папку с файлом)
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Done |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-001 |
@@ -51,11 +51,11 @@
 
 | # | Файл | Действие | Что именно |
 |---|---|---|---|
-| 1 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/NotificationModel.kt` | Создать | data class + `NotificationModels` (object в том же файле) |
-| 2 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/NotificationContent.kt` | Создать | `@Composable` |
-| 3 | `src/main/kotlin/by/sparkyanvil/fastcow/ui/NotificationWindow.kt` | Создать | класс |
-| 4 | `src/main/kotlin/by/sparkyanvil/fastcow/platform/windows/ExplorerLauncher.kt` | Создать | класс |
-| 5 | `src/test/kotlin/by/sparkyanvil/fastcow/ui/NotificationModelsTest.kt` | Создать | unit |
+| 1 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/NotificationModel.kt` | Создать | data class + `NotificationModels` (object в том же файле) |
+| 2 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/NotificationContent.kt` | Создать | `@Composable` |
+| 3 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/ui/NotificationWindow.kt` | Создать | класс |
+| 4 | `src/main/kotlin/by/sparkyanvil/fastcowscreenshot/platform/windows/ExplorerLauncher.kt` | Создать | класс |
+| 5 | `src/test/kotlin/by/sparkyanvil/fastcowscreenshot/ui/NotificationModelsTest.kt` | Создать | unit |
 
 **Файлы, которые изменять нельзя:** все, кроме перечисленных.
 
@@ -66,7 +66,7 @@
 ## 6. Контракты
 
 ```kotlin
-package by.sparkyanvil.fastcow.ui
+package by.sparkyanvil.fastcowscreenshot.ui
 
 /** Что показать. folderTooltip — полный путь, если строка папки сокращена; иначе null. */
 internal data class NotificationModel(
@@ -117,7 +117,7 @@ internal fun NotificationContent(model: NotificationModel, onClick: () -> Unit, 
 ```
 
 ```kotlin
-package by.sparkyanvil.fastcow.platform.windows
+package by.sparkyanvil.fastcowscreenshot.platform.windows
 
 /** Проводник. Вызывать на fcs-dialog (COM STA). Не бросает. */
 internal class ExplorerLauncher(private val shell32: Shell32Api = Shell32Api.INSTANCE) {
@@ -230,17 +230,17 @@ MaterialTheme {
 
 | Команда | Ожидаемый результат |
 |---|---|
-| `.\gradlew.bat test --tests "by.sparkyanvil.fastcow.ui.NotificationModelsTest"` | 7 тестов |
+| `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.ui.NotificationModelsTest"` | 7 тестов |
 | `.\gradlew.bat build` | `BUILD SUCCESSFUL` |
 
 Ручная проверка окна — шаги 5–8 раздела 12 TASK-015.
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Шаги 1–4 выполнены; контракты — как в разделе 6.
-- [ ] Один экземпляр `JWindow` на всё время работы.
-- [ ] 7 тестов проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Шаги 1–4 выполнены; контракты — как в разделе 6.
+- [x] Один экземпляр `JWindow` на всё время работы.
+- [x] 7 тестов проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -262,4 +262,4 @@ MaterialTheme {
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-10-30 | Review | Реализованы NotificationModel/NotificationModels, NotificationContent, NotificationWindow, ExplorerLauncher и 7 тестов NotificationModelsTest. `gradlew build` — BUILD SUCCESSFUL, 7/7 тестов. Отклонений нет; в fromOutcome строка папки для пустого Path обрабатывается по таблице 8.1. Ручная проверка окна — в TASK-015. TASK-010 переведена в Done по указанию пользователя. |
