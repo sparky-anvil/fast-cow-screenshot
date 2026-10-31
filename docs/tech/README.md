@@ -27,6 +27,7 @@
 | ID | Название | Входные артефакты | Статус |
 |---|---|---|---|
 | [TDD-001](designs/TDD-001-screen-capture-v1.md) | Захват экрана (3 режима), буфер, автосохранение, «Сохранить как», настройки — v1 Windows | REQ-001, US-001 – US-007, RES-001 | Review |
+| [TDD-002](designs/TDD-002-release-process.md) | Процесс релиза и выпуск версии 0.0.1 | ADR-004, запрос пользователя | Review |
 
 ## Задачи
 
@@ -53,6 +54,9 @@
 | [TASK-017](tasks/TASK-017-fix-hotkey-recording.md) | Исправление записи сочетания клавиш (CLR-003) | TDD-001 | 014 | S | Done |
 | [TASK-018](tasks/TASK-018-runtime-modules-list.md) | Явный список модулей runtime (CLR-004) | TDD-001 | 015 | S | Done |
 | [TASK-019](tasks/TASK-019-jvm-heap-uncommit.md) | Флаги G1 для возврата памяти ОС, замер RSS (CLR-005) | TDD-001 | 018 | S | Done |
+| [TASK-020](tasks/TASK-020-version-and-release-plugin.md) | Версия из gradle.properties, плагин релиза, `packageReleaseZip` | TDD-002 | 016 | M | Ready |
+| [TASK-021](tasks/TASK-021-github-release-workflow.md) | Workflow GitHub Actions для релиза | TDD-002 | 020 | S | Ready |
+| [TASK-022](tasks/TASK-022-release-0-0-1.md) | Выпуск версии 0.0.1 | TDD-002 | 020, 021 | S | Ready |
 
 ## Порядок выполнения
 
@@ -60,6 +64,9 @@
 
 TASK-001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 011 → 012 → 013 → 014 → 017 → 015 → 018 → 019 → 016.
 TASK-002/003/005 и TASK-011/012/013 между собой независимы.
+
+Релиз (TDD-002): TASK-020 → 021 → 022. Перед TASK-022 изменения TASK-020/021 должны быть закоммичены и отправлены
+в `main` (предусловия TASK-022).
 
 ## Запросы уточнения
 

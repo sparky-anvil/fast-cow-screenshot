@@ -4,7 +4,7 @@
 |---|---|
 | Автор | Tech |
 | Дата последнего изменения | 2026-10-31 |
-| Связанные ADR | ADR-001, ADR-002, ADR-003 |
+| Связанные ADR | ADR-001, ADR-002, ADR-003, ADR-004 |
 
 > Единый источник правды для Dev. Каждая задача (TASK) предполагает, что исполнитель прочитал этот документ.
 > Всё, что здесь записано, обязательно, если в задаче явно не сказано иное.
@@ -24,6 +24,12 @@
 | Логирование | SLF4J + Logback | 2.0.17 / 1.5.38 | `org.slf4j:slf4j-api`, `ch.qos.logback:logback-classic` | ADR-003 |
 | Тесты | JUnit Jupiter + MockK + kotlin-test | 6.1.3 / 1.14.11 / 2.4.21 | `org.junit:junit-bom`, `org.junit.jupiter:junit-jupiter`, `org.junit.platform:junit-platform-launcher`, `io.mockk:mockk`, `org.jetbrains.kotlin:kotlin-test` | ADR-003 |
 | Упаковка | Compose `nativeDistributions` → `createDistributable` (jpackage app-image); runtime — явный список `modules(...)`, без `includeAllModules` и без `jdk.jlink`/`jdk.jpackage` (Temurin 25 без `jmods`, JEP 493; CLR-004) | — | — | ADR-001 |
+| Релиз | Gradle-плагин `net.researchgate.release`; тег `v<версия>`, ветка `main`; ZIP app-image (`packageReleaseZip`) | 3.2.0 | алиас `libs.plugins.researchgate.release` | ADR-004 |
+| CI релиза | GitHub Actions `.github/workflows/release.yml`, `windows-latest`, по тегу `v*` | checkout@v7, setup-java@v6, setup-gradle@v6, action-gh-release@v3 | — | ADR-004 |
+
+**Версия приложения.** Единственный источник — строка `version=` в `gradle.properties` (`X.Y.Z-SNAPSHOT` в разработке).
+Руками её не менять: это делает `release`. `packageVersion` = версия без `-SNAPSHOT`; в коде — только `AppInfo.VERSION`
+(читается из ресурса `app-info.properties`, который заполняет `processResources`). Литералы версий в коде запрещены.
 
 Добавлять зависимости, не перечисленные в этой таблице или в задаче, **запрещено**. `kotlinx-coroutines` приходит
 транзитивно через Compose — в своём коде его **не использовать**.
@@ -85,7 +91,9 @@ fast-cow-screenshot/
 | Один тест | `.\gradlew.bat test --tests "by.sparkyanvil.fastcowscreenshot.domain.PixelRectTest"` | Тесты класса проходят |
 | Компиляция | `.\gradlew.bat compileKotlin compileTestKotlin` | `BUILD SUCCESSFUL` |
 | Запуск приложения | `.\gradlew.bat run` | Приложение запущено, значок в трее; закрыть через «Выход» в трее. Запускать с таймаутом, если запускает агент |
-| Дистрибутив | `.\gradlew.bat createDistributable` | `build\compose\binaries\main\app\fast-cow-screenshot\fast-cow-screenshot.exe` |
+| Дистрибутив | `.\gradlew.bat createDistributable` | `build\compose\binaries\main\app\FastCScreen\FastCScreen.exe` (`packageName = "FastCScreen"`, с TASK-020; имя проекта, `AppInfo.NAME` и каталоги данных остаются `fast-cow-screenshot`) |
+| ZIP релиза | `.\gradlew.bat packageReleaseZip` | `build\release\fast-cow-screenshot-<версия>-windows-x64.zip` |
+| Релиз | `.\gradlew.bat release "-Prelease.useAutomaticVersion=true" "-Prelease.releaseVersion=X.Y.Z" "-Prelease.newVersion=X.Y.(Z+1)-SNAPSHOT"` | Только в задаче релиза, с `main`, чистое дерево, с подтверждения пользователя |
 
 Статический анализ в v1 не подключается.
 
@@ -212,3 +220,4 @@ fast-cow-screenshot/
 | 2026-10-31 | §9: правило для Compose-событий клавиатуры | CLR-003, TASK-017 |
 | 2026-10-31 | §1: runtime дистрибутива — явный список модулей (Temurin 25 без jmods) | CLR-004, TASK-018 |
 | 2026-10-31 | §7: флаги G1 для возврата памяти ОС | CLR-005, TASK-019 |
+| 2026-10-31 | §1, §4: процесс релиза, версия в `gradle.properties`; exe дистрибутива — `FastCScreen.exe` | ADR-004, TASK-020 – TASK-022 |
