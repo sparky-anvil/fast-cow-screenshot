@@ -275,6 +275,7 @@ DPI awareness EDT и `fcs-capture`, регистрация каждой клав
 | N3 ≤ 250 мс | Оверлей на Java2D, рисует кадр без копирования | лог `Overlay shown in N ms` |
 | N4 ≤ 1,5 с | `ImageIO`, `compressionQuality = 0.5f` (deflate 4), `TYPE_INT_RGB` | лог `Saved {} in N ms` |
 | N6 heap ≤ 400 МБ | `-Xmx768m`; один кадр в памяти + одна DIB-копия при записи в буфер | VisualVM / Диспетчер задач, TASK-016 |
+| N6 RSS ≤ 200 МБ до первого снимка, ≤ 300 МБ после снимков, рост ≤ 10 % (ред. 3, CLR-006) | Флаги G1 возврата памяти ОС (TASK-019) | Скрипт замера TASK-019 |
 | N7 | Освобождение GDI/HGLOBAL в `finally` | 1000 захватов, TASK-016 |
 
 ## 14. Стратегия тестирования
@@ -292,8 +293,8 @@ DPI awareness EDT и `fcs-capture`, регистрация каждой клав
 | AWT/Skia не выставили per-monitor DPI процессу | Низкая | Высокое | Поток захвата сам входит в V2; EDT-awareness логируется при старте |
 | WM_DPICHANGED меняет размер окна оверлея | Средняя | Высокое | Двойной `SetWindowPos` + проверка `GetWindowRect` (TASK-013) |
 | N3 не выполняется при первом показе | Средняя | Среднее | Замер; при нарушении — CLR к Tech |
-| Skia повышает RSS > 200 МБ (N6) | Средняя | Среднее | Замер в TASK-016 |
-| G1 не возвращает committed heap ОС после снимков: RSS 438–646 МБ при heap used 27 МБ | Произошёл | Высокое | Флаги `G1PeriodicGCInterval`, `Min/MaxHeapFreeRatio` (TASK-019, CLR-005); если не хватит — уточнение N6 у Analyst |
+| Skia повышает RSS > 200 МБ (N6) | Произошёл | Среднее | ≈ 230 МБ нативной памяти после первого показа окон; N6 уточнён: ≤ 300 МБ после снимков (CLR-006) |
+| G1 не возвращает committed heap ОС после снимков: RSS 438–646 МБ при heap used 27 МБ | Произошёл | Высокое | Флаги `G1PeriodicGCInterval`, `Min/MaxHeapFreeRatio` (TASK-019, CLR-005): RSS 266–271 МБ, committed 38 МБ |
 | JDK без `jmods` (JEP 493) не включает `jdk.jlink` в образ | Произошёл | Высокое | Явный список `modules(...)` (TASK-018, CLR-004) |
 | `SHBrowseForFolderW` — пути ≤ 260 символов | Высокая | Низкое | REQ-001.51 Could; NIO работает с длинными путями |
 | Excel и др. теряют `Ctrl+Shift+1/2/3` | Высокая | Низкое | Переназначение (TASK-014) |

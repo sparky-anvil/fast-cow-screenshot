@@ -1,4 +1,4 @@
-# Техническая документация проекта fast-cow-screenshot
+﻿# Техническая документация проекта fast-cow-screenshot
 
 Рабочее пространство агентов **Tech** (`.kilo/agent/tech.md`) и **Dev** (`.kilo/agent/dev.md`).
 
@@ -49,10 +49,10 @@
 | [TASK-013](tasks/TASK-013-region-overlay.md) | Оверлей выделения области | TDD-001 | 002, 005, 010 | L | Done |
 | [TASK-014](tasks/TASK-014-settings-window.md) | Окно настроек | TDD-001 | 004, 005, 007, 009, 010, 011 | L | Done |
 | [TASK-015](tasks/TASK-015-tray-app-wiring.md) | Трей, сборка приложения, приёмка | TDD-001 | 011, 012, 013, 014, 017 | M | Done |
-| [TASK-016](tasks/TASK-016-distribution-and-nfr.md) | Дистрибутив app-image и замеры NFR | TDD-001 | 015, 018, 019 | S | Ready |
+| [TASK-016](tasks/TASK-016-distribution-and-nfr.md) | Дистрибутив app-image и замеры NFR | TDD-001 | 015, 018, 019 | S | Done |
 | [TASK-017](tasks/TASK-017-fix-hotkey-recording.md) | Исправление записи сочетания клавиш (CLR-003) | TDD-001 | 014 | S | Done |
 | [TASK-018](tasks/TASK-018-runtime-modules-list.md) | Явный список модулей runtime (CLR-004) | TDD-001 | 015 | S | Done |
-| [TASK-019](tasks/TASK-019-jvm-heap-uncommit.md) | Флаги G1 для возврата памяти ОС, замер RSS (CLR-005) | TDD-001 | 018 | S | Blocked |
+| [TASK-019](tasks/TASK-019-jvm-heap-uncommit.md) | Флаги G1 для возврата памяти ОС, замер RSS (CLR-005) | TDD-001 | 018 | S | Done |
 
 ## Порядок выполнения
 
@@ -71,5 +71,9 @@ TASK-002/003/005 и TASK-011/012/013 между собой независимы.
 | [CLR-002](clarifications/CLR-002-mockk-agent-cyrillic-path.md) | Self-attach MockK падает из-за кириллицы в пути к Gradle-кэшу | TASK-004 | Tech | Да | Closed |
 | [CLR-003](clarifications/CLR-003-compose-native-key-event-cast.md) | ClassCastException nativeKeyEvent в окне настроек (шаг 26 приёмки) | TASK-015 (дефект TASK-014) | Tech | Да | Closed |
 | [CLR-004](clarifications/CLR-004-jlink-no-jmods-temurin25.md) | createDistributable: Temurin 25 без jmods, jlink падает | TASK-016 | Tech | Да | Closed |
-| [CLR-005](clarifications/CLR-005-rss-over-200mb-after-captures.md) | RSS 438–646 МБ после снимков (N6 ≤ 200); неэталонная конфигурация замеров | TASK-016 | Tech | Да | Answered |
-| [CLR-006](clarifications/CLR-006-n6-rss-definition.md) | N6: «в простое» — до или после снимков (RSS 266–271 МБ при heap 38 МБ) | TASK-019 | Analyst | Да | Open |
+| [CLR-005](clarifications/CLR-005-rss-over-200mb-after-captures.md) | RSS 438–646 МБ после снимков (N6 ≤ 200); неэталонная конфигурация замеров | TASK-016 | Tech | Да | Closed |
+| [CLR-006](clarifications/CLR-006-n6-rss-definition.md) | N6: «в простое» — до или после снимков (RSS 266–271 МБ при heap 38 МБ) | TASK-019 | Tech | Да | Closed |
+
+
+
+
