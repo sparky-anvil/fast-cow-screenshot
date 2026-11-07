@@ -1,4 +1,4 @@
-﻿# Техническая документация проекта fast-cow-screenshot
+# Техническая документация проекта fast-cow-screenshot
 
 Рабочее пространство агентов **Tech** (`.kilo/agent/tech.md`) и **Dev** (`.kilo/agent/dev.md`).
 
@@ -28,6 +28,7 @@
 |---|---|---|---|
 | [TDD-001](designs/TDD-001-screen-capture-v1.md) | Захват экрана (3 режима), буфер, автосохранение, «Сохранить как», настройки — v1 Windows | REQ-001, US-001 – US-007, RES-001 | Review |
 | [TDD-002](designs/TDD-002-release-process.md) | Процесс релиза и выпуск версии 0.0.1 | ADR-004, запрос пользователя | Review |
+| [TDD-003](designs/TDD-003-multi-region-capture.md) | Режим «Несколько областей»: выделение регионов и склейка | REQ-002, US-008 – US-010, ADR-005 | Review |
 
 ## Задачи
 
@@ -57,6 +58,13 @@
 | [TASK-020](tasks/TASK-020-version-and-release-plugin.md) | Версия из gradle.properties, плагин релиза, `packageReleaseZip` | TDD-002 | 016 | M | Done |
 | [TASK-021](tasks/TASK-021-github-release-workflow.md) | Workflow GitHub Actions для релиза | TDD-002 | 020 | S | Done |
 | [TASK-022](tasks/TASK-022-release-0-0-1.md) | Выпуск версии 0.0.1 | TDD-002 | 020, 021 | S | Review |
+| [TASK-023](tasks/TASK-023-stitch-layout.md) | Раскладка склейки `StitchLayout` | TDD-003 | — | M | Ready |
+| [TASK-024](tasks/TASK-024-multi-region-settings-model.md) | Настройки режима и клавиши оверлея | TDD-003 | — | M | Ready |
+| [TASK-025](tasks/TASK-025-multi-selection-state.md) | Состояние выделения, `MultiRegionSelector` | TDD-003 | 024 | M | Ready |
+| [TASK-026](tasks/TASK-026-multi-region-overlay.md) | Оверлей `MultiRegionOverlay` | TDD-003 | 025 | L | Ready |
+| [TASK-027](tasks/TASK-027-multi-region-capture-mode.md) | Режим `MULTI_REGION`: координатор, склейка, подключение | TDD-003 | 023, 024, 026 | L | Ready |
+| [TASK-028](tasks/TASK-028-multi-region-settings-ui.md) | Раздел настроек «Несколько областей» | TDD-003 | 027 | L | Ready |
+| [TASK-029](tasks/TASK-029-multi-region-acceptance.md) | Приёмка и замеры NFR режима | TDD-003 | 028 | S | Ready |
 
 ## Порядок выполнения
 
@@ -67,6 +75,8 @@ TASK-002/003/005 и TASK-011/012/013 между собой независимы.
 
 Релиз (TDD-002): TASK-020 → 021 → 022. Перед TASK-022 изменения TASK-020/021 должны быть закоммичены и отправлены
 в `main` (предусловия TASK-022).
+
+Несколько областей (TDD-003): TASK-023 и TASK-024 независимы; затем 024 → 025 → 026; 023 + 026 → 027 → 028 → 029.
 
 ## Запросы уточнения
 

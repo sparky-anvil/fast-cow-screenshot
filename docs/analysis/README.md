@@ -21,7 +21,7 @@
 | ID | Название | Приоритет | Статус |
 |---|---|---|---|
 | [REQ-001](requirements/REQ-001-screen-capture-clipboard-save.md) | Захват экрана с учётом мультимонитора, автокопирование в буфер и сохранение файлов | Must | Review |
-| [REQ-002](requirements/REQ-002-multi-region-capture.md) | Режим «Несколько областей»: выделение нескольких регионов и склейка в одно изображение | Should | Draft |
+| [REQ-002](requirements/REQ-002-multi-region-capture.md) | Режим «Несколько областей»: выделение нескольких регионов и склейка в одно изображение | Should | Approved |
 
 ## User stories
 
@@ -34,9 +34,9 @@
 | [US-005](user-stories/US-005-auto-save-to-default-directory.md) | Автосохранение снимка в директорию по умолчанию | REQ-001 | Review |
 | [US-006](user-stories/US-006-save-as.md) | «Сохранить как…» в выбранную директорию | REQ-001 | Review |
 | [US-007](user-stories/US-007-default-directory-setting.md) | Настройка директории по умолчанию | REQ-001 | Review |
-| [US-008](user-stories/US-008-select-multiple-regions.md) | Выделение нескольких областей на экране | REQ-002 | Draft |
-| [US-009](user-stories/US-009-stitch-regions.md) | Склейка нескольких областей в одно изображение | REQ-002 | Draft |
-| [US-010](user-stories/US-010-multi-region-settings.md) | Настройки режима «Несколько областей» | REQ-002 | Draft |
+| [US-008](user-stories/US-008-select-multiple-regions.md) | Выделение нескольких областей на экране | REQ-002 | Approved |
+| [US-009](user-stories/US-009-stitch-regions.md) | Склейка нескольких областей в одно изображение | REQ-002 | Approved |
+| [US-010](user-stories/US-010-multi-region-settings.md) | Настройки режима «Несколько областей» | REQ-002 | Approved |
 
 ## Архитектурные решения
 
@@ -46,6 +46,7 @@
 | [ADR-002](decisions/ADR-002-winapi-via-jna.md) | WinAPI через JNA: GDI-захват, RegisterHotKey, CF_DIB, нативные диалоги | Accepted |
 | [ADR-003](decisions/ADR-003-settings-logging-tests.md) | Настройки JSON в %APPDATA%, SLF4J + Logback, JUnit 6 + MockK | Accepted |
 | [ADR-004](decisions/ADR-004-release-process.md) | Релиз: net.researchgate.release, ZIP app-image, GitHub Actions по тегу | Accepted |
+| [ADR-005](decisions/ADR-005-multi-region-overlay-keys-and-stitching.md) | Режим «Несколько областей»: локальные клавиши оверлея, склейка сжатием координат, палитра цвета | Accepted |
 
 ## Исследования
 

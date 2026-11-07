@@ -3,8 +3,8 @@
 | Поле | Значение |
 |---|---|
 | Автор | Tech |
-| Дата последнего изменения | 2026-10-31 |
-| Связанные ADR | ADR-001, ADR-002, ADR-003, ADR-004 |
+| Дата последнего изменения | 2026-11-08 |
+| Связанные ADR | ADR-001, ADR-002, ADR-003, ADR-004, ADR-005 |
 
 > Единый источник правды для Dev. Каждая задача (TASK) предполагает, что исполнитель прочитал этот документ.
 > Всё, что здесь записано, обязательно, если в задаче явно не сказано иное.
@@ -188,6 +188,11 @@ fast-cow-screenshot/
 - Compose-события клавиатуры: `KeyEvent.nativeKeyEvent` **не** приводить к `java.awt.event.KeyEvent` (в Compose 1.12.2
   это `InternalKeyEvent`). Код клавиши — `e.key.nativeKeyCode` (AWT `VK_*`), модификаторы — `e.isCtrlPressed`,
   `e.isAltPressed`, `e.isShiftPressed` (CLR-003). Решение по нажатию выносить в чистую функцию с unit-тестами.
+  `NumPad Enter` отличать от `Enter` сравнением `e.key == Key.NumPadEnter` (`androidx.compose.ui.input.key.Key`);
+  в AWT-окнах (оверлей) — `e.keyLocation == KeyEvent.KEY_LOCATION_NUMPAD`.
+- Клавиши: глобальные горячие клавиши — `settings.HotkeyBinding` (коды Windows, обязателен Ctrl или Alt);
+  локальные клавиши оверлея «Несколько областей» — `settings.OverlayKey` (коды AWT `VK_*`, модификаторы необязательны,
+  ADR-005). Эти типы не смешивать и не конвертировать друг в друга.
 - Тесты с реальным WinAPI помечаются `@EnabledOnOs(OS.WINDOWS)` и не требуют действий пользователя.
 - Реальный захват на нескольких мониторах, HiDPI, горячие клавиши, трей и вставку из буфера проверяет пользователь
   по шагам раздела «Проверка» задачи.
@@ -221,3 +226,4 @@ fast-cow-screenshot/
 | 2026-10-31 | §1: runtime дистрибутива — явный список модулей (Temurin 25 без jmods) | CLR-004, TASK-018 |
 | 2026-10-31 | §7: флаги G1 для возврата памяти ОС | CLR-005, TASK-019 |
 | 2026-10-31 | §1, §4: процесс релиза, версия в `gradle.properties`; exe дистрибутива — `FastCScreen.exe` | ADR-004, TASK-020 – TASK-022 |
+| 2026-11-08 | §9: `NumPad Enter` в Compose/AWT; разделение `HotkeyBinding` и `OverlayKey` | ADR-005, TDD-003 |
