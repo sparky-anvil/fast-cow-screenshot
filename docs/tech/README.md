@@ -56,7 +56,7 @@
 | [TASK-019](tasks/TASK-019-jvm-heap-uncommit.md) | Флаги G1 для возврата памяти ОС, замер RSS (CLR-005) | TDD-001 | 018 | S | Done |
 | [TASK-020](tasks/TASK-020-version-and-release-plugin.md) | Версия из gradle.properties, плагин релиза, `packageReleaseZip` | TDD-002 | 016 | M | Done |
 | [TASK-021](tasks/TASK-021-github-release-workflow.md) | Workflow GitHub Actions для релиза | TDD-002 | 020 | S | Done |
-| [TASK-022](tasks/TASK-022-release-0-0-1.md) | Выпуск версии 0.0.1 | TDD-002 | 020, 021 | S | In Progress |
+| [TASK-022](tasks/TASK-022-release-0-0-1.md) | Выпуск версии 0.0.1 | TDD-002 | 020, 021 | S | Review |
 
 ## Порядок выполнения
 

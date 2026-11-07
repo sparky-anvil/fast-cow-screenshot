@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | In Progress |
+| Статус | Review |
 | Приоритет | Must |
 | Оценка | S (≤ 1 ч) |
 | Технический дизайн | TDD-002 |
@@ -160,11 +160,11 @@
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Тег `v0.0.1` есть в `origin`.
-- [ ] `gradle.properties` на `main` — `version=0.0.2-SNAPSHOT`.
-- [ ] GitHub Release `v0.0.1` содержит `fast-cow-screenshot-0.0.1-windows-x64.zip`.
-- [ ] Приложение из ZIP пишет в лог `fast-cow-screenshot 0.0.1 started`.
-- [ ] Журнал заполнен, статус `Review`.
+- [x] Тег `v0.0.1` есть в `origin`.
+- [x] `gradle.properties` на `main` — `version=0.0.2-SNAPSHOT`.
+- [x] GitHub Release `v0.0.1` содержит `fast-cow-screenshot-0.0.1-windows-x64.zip`.
+- [x] Приложение из ZIP пишет в лог `fast-cow-screenshot 0.0.1 started`.
+- [x] Журнал заполнен, статус `Review`.
 
 ## 14. Чего НЕ делать
 
