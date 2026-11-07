@@ -11,6 +11,7 @@ internal data class AppSettings(
     val includeCursor: Boolean = false,
     val autoSaveEnabled: Boolean = true,
     val hotkeys: HotkeySettings = HotkeySettings(),
+    val multiRegion: MultiRegionSettings = MultiRegionSettings(),
 ) {
     /** HotkeyBinding.parse(hotkeys.get(action)) ?: HotkeyBinding.defaultFor(action). */
     fun hotkeyBinding(action: HotkeyAction): HotkeyBinding =
