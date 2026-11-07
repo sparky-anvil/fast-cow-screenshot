@@ -1,4 +1,4 @@
-# Техническая документация проекта fast-cow-screenshot
+﻿# Техническая документация проекта fast-cow-screenshot
 
 Рабочее пространство агентов **Tech** (`.kilo/agent/tech.md`) и **Dev** (`.kilo/agent/dev.md`).
 
@@ -58,7 +58,7 @@
 | [TASK-020](tasks/TASK-020-version-and-release-plugin.md) | Версия из gradle.properties, плагин релиза, `packageReleaseZip` | TDD-002 | 016 | M | Done |
 | [TASK-021](tasks/TASK-021-github-release-workflow.md) | Workflow GitHub Actions для релиза | TDD-002 | 020 | S | Done |
 | [TASK-022](tasks/TASK-022-release-0-0-1.md) | Выпуск версии 0.0.1 | TDD-002 | 020, 021 | S | Review |
-| [TASK-023](tasks/TASK-023-stitch-layout.md) | Раскладка склейки `StitchLayout` | TDD-003 | — | M | Ready |
+| [TASK-023](tasks/TASK-023-stitch-layout.md) | Раскладка склейки `StitchLayout` | TDD-003 | — | M | Review |
 | [TASK-024](tasks/TASK-024-multi-region-settings-model.md) | Настройки режима и клавиши оверлея | TDD-003 | — | M | Ready |
 | [TASK-025](tasks/TASK-025-multi-selection-state.md) | Состояние выделения, `MultiRegionSelector` | TDD-003 | 024 | M | Ready |
 | [TASK-026](tasks/TASK-026-multi-region-overlay.md) | Оверлей `MultiRegionOverlay` | TDD-003 | 025 | L | Ready |
