@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Verify tag matches gradle.properties version
+        shell: pwsh
+        run: |
+          $expected = '${{ github.ref_name }}'.TrimStart('v')
+          $line = Get-Content gradle.properties | Where-Object { $_ -match '^version=' } | Select-Object -First 1
+          $actual = ($line -replace '^version=', '').Trim()
+          if ($actual -ne $expected) {
+            Write-Error "Tag version $expected != gradle.properties version $actual"
+            exit 1
+          }
+
+      - name: Build release ZIP
+        shell: pwsh
+        run: .\gradlew.bat packageReleaseZip --no-daemon
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          files: build/release/fast-cow-screenshot-*-windows-x64.zip
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          draft: false
+          prerelease: false

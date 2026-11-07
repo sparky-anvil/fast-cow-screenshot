@@ -1,14 +1,18 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import net.researchgate.release.ReleaseExtension
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.researchgate.release)
 }
 
 group = "by.sparkyanvil.fastcowscreenshot"
-version = "1.0.0"
+// Версия задаётся в gradle.properties (ADR-004) и правится плагином net.researchgate.release.
+val appVersion: String = project.version.toString()
+val appPackageVersion: String = appVersion.removeSuffix("-SNAPSHOT")
 
 kotlin {
     jvmToolchain(25)
@@ -51,14 +55,21 @@ tasks.test {
     }
 }
 
+tasks.processResources {
+    inputs.property("appVersion", appVersion)
+    filesMatching("app-info.properties") {
+        expand(mapOf("version" to appVersion))
+    }
+}
+
 compose.desktop {
     application {
         mainClass = "by.sparkyanvil.fastcowscreenshot.MainKt"
         jvmArgs += appJvmArgs
         nativeDistributions {
             targetFormats(TargetFormat.Msi)
-            packageName = "fast-cow-screenshot"
-            packageVersion = "1.0.0"
+            packageName = "FastCScreen"
+            packageVersion = appPackageVersion
             // Temurin 25 без jmods (JEP 493): jdk.jlink в образ включать нельзя, поэтому список модулей явный (CLR-004).
             modules(
                 "java.datatransfer",
@@ -79,5 +90,23 @@ compose.desktop {
                 "jdk.zipfs",
             )
         }
+    }
+}
+
+// ZIP app-image для GitHub Release (ADR-004, TASK-021).
+tasks.register<Zip>("packageReleaseZip") {
+    group = "distribution"
+    description = "Packs the app-image into build/release/fast-cow-screenshot-<version>-windows-x64.zip"
+    dependsOn("createDistributable")
+    from(layout.buildDirectory.dir("compose/binaries/main/app"))
+    archiveFileName.set("fast-cow-screenshot-$appVersion-windows-x64.zip")
+    destinationDirectory.set(layout.buildDirectory.dir("release"))
+}
+
+// Релиз: .\gradlew.bat release (TASK-022). Тег v<версия>, только с ветки main (ADR-004).
+configure<ReleaseExtension> {
+    tagTemplate.set("v\${version}")
+    with(git) {
+        requireBranch.set("main")
     }
 }
