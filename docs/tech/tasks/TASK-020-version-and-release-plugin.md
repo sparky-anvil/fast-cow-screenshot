@@ -1,8 +1,8 @@
-# TASK-020: Перенести версию в gradle.properties, подключить плагин релиза и задачу packageReleaseZip
+﻿# TASK-020: Перенести версию в gradle.properties, подключить плагин релиза и задачу packageReleaseZip
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Review |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-002 |
@@ -263,14 +263,14 @@ internal object AppInfo {
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Все шаги раздела 7 выполнены.
-- [ ] Сигнатуры совпадают с разделом 6.
-- [ ] Случаи раздела 9 обработаны.
-- [ ] 8 тестов раздела 11 проходят.
-- [ ] Проверки раздела 12 выполнены, результат в журнале.
-- [ ] Строка `1.0.0` больше не встречается в `build.gradle.kts`, `AppInfo.kt`, `AppInfoTest.kt`.
-- [ ] В `build.gradle.kts` `packageName = "FastCScreen"`; `AppInfo.NAME` и `rootProject.name` не изменены.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Все шаги раздела 7 выполнены.
+- [x] Сигнатуры совпадают с разделом 6.
+- [x] Случаи раздела 9 обработаны.
+- [x] 8 тестов раздела 11 проходят.
+- [x] Проверки раздела 12 выполнены, результат в журнале.
+- [x] Строка `1.0.0` больше не встречается в `build.gradle.kts`, `AppInfo.kt`, `AppInfoTest.kt`.
+- [x] В `build.gradle.kts` `packageName = "FastCScreen"`; `AppInfo.NAME` и `rootProject.name` не изменены.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -306,4 +306,4 @@ internal object AppInfo {
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-11-07 | Review | Шаги 1–8 выполнены по задаче, отклонений нет. Ветка feature/TDD-002-release-process. `gradlew clean build packageReleaseZip` и `help --task release` — BUILD SUCCESSFUL; AppInfoTest 8/8; app-info.properties = version=0.0.1-SNAPSHOT; FastCScreen.exe, FastCScreen.cfg и exe в распакованном ZIP — True. Ручная проверка (трей, имя процесса, лог версии) пользователем: работает как описано. `release` не запускался. |
