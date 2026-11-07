@@ -21,6 +21,7 @@
 | ID | Название | Приоритет | Статус |
 |---|---|---|---|
 | [REQ-001](requirements/REQ-001-screen-capture-clipboard-save.md) | Захват экрана с учётом мультимонитора, автокопирование в буфер и сохранение файлов | Must | Review |
+| [REQ-002](requirements/REQ-002-multi-region-capture.md) | Режим «Несколько областей»: выделение нескольких регионов и склейка в одно изображение | Should | Draft |
 
 ## User stories
 
@@ -33,6 +34,9 @@
 | [US-005](user-stories/US-005-auto-save-to-default-directory.md) | Автосохранение снимка в директорию по умолчанию | REQ-001 | Review |
 | [US-006](user-stories/US-006-save-as.md) | «Сохранить как…» в выбранную директорию | REQ-001 | Review |
 | [US-007](user-stories/US-007-default-directory-setting.md) | Настройка директории по умолчанию | REQ-001 | Review |
+| [US-008](user-stories/US-008-select-multiple-regions.md) | Выделение нескольких областей на экране | REQ-002 | Draft |
+| [US-009](user-stories/US-009-stitch-regions.md) | Склейка нескольких областей в одно изображение | REQ-002 | Draft |
+| [US-010](user-stories/US-010-multi-region-settings.md) | Настройки режима «Несколько областей» | REQ-002 | Draft |
 
 ## Архитектурные решения
 
