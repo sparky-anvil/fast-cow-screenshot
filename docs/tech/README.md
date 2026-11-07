@@ -28,7 +28,7 @@
 |---|---|---|---|
 | [TDD-001](designs/TDD-001-screen-capture-v1.md) | Захват экрана (3 режима), буфер, автосохранение, «Сохранить как», настройки — v1 Windows | REQ-001, US-001 – US-007, RES-001 | Review |
 | [TDD-002](designs/TDD-002-release-process.md) | Процесс релиза и выпуск версии 0.0.1 | ADR-004, запрос пользователя | Review |
-| [TDD-003](designs/TDD-003-multi-region-capture.md) | Режим «Несколько областей»: выделение регионов и склейка | REQ-002, US-008 – US-010, ADR-005 | Review |
+| [TDD-003](designs/TDD-003-multi-region-capture.md) | Режим «Несколько областей»: выделение регионов и склейка | REQ-002, US-008 – US-010, ADR-005 | Approved |
 
 ## Задачи
 
