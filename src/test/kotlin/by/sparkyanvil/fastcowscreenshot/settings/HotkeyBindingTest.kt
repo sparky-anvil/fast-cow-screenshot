@@ -1,4 +1,4 @@
-﻿package by.sparkyanvil.fastcowscreenshot.settings
+package by.sparkyanvil.fastcowscreenshot.settings
 
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -43,5 +43,21 @@ class HotkeyBindingTest {
     @Test
     fun `defaults per action`() {
         assertEquals("Ctrl+Shift+3", HotkeyBinding.defaultFor(HotkeyAction.REGION).format())
+    }
+
+    @Test
+    fun `multi region default is ctrl shift 4`() {
+        assertEquals("Ctrl+Shift+4", HotkeyBinding.defaultFor(HotkeyAction.MULTI_REGION).format())
+        assertEquals(
+            "Ctrl+Shift+4",
+            AppSettings(defaultDirectory = "C:\\s").hotkeyBinding(HotkeyAction.MULTI_REGION).format(),
+        )
+    }
+
+    @Test
+    fun `hotkey settings with and get multi region`() {
+        val s = HotkeySettings().with(HotkeyAction.MULTI_REGION, "Ctrl+Alt+M")
+        assertEquals("Ctrl+Alt+M", s.get(HotkeyAction.MULTI_REGION))
+        assertEquals(HotkeySettings().region, s.region)
     }
 }

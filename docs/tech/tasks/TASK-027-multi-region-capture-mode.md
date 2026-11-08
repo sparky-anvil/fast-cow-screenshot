@@ -1,8 +1,8 @@
-# TASK-027: Добавить режим `MULTI_REGION` в координатор, склейку пикселей и подключение оверлея
+﻿# TASK-027: Добавить режим `MULTI_REGION` в координатор, склейку пикселей и подключение оверлея
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Review |
 | Приоритет | Must |
 | Оценка | L (3–6 ч) |
 | Технический дизайн | TDD-003 §5, §6, §8, §9, §12 |
@@ -335,11 +335,11 @@ private class FakeMultiSelector : MultiRegionSelector {
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Новые элементы enum — последними; `HotkeySettings.multiRegion` — последним полем.
-- [ ] Сигнатуры совпадают с разделом 6; режимы REQ-001 работают как раньше (старые тесты проходят).
-- [ ] Тесты 1–15 написаны и проходят.
-- [ ] Ручная проверка 1–9 выполнена.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Новые элементы enum — последними; `HotkeySettings.multiRegion` — последним полем.
+- [x] Сигнатуры совпадают с разделом 6; режимы REQ-001 работают как раньше (старые тесты проходят).
+- [x] Тесты 1–15 написаны и проходят.
+- [x] Ручная проверка 1–9 выполнена.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -362,4 +362,4 @@ private class FakeMultiSelector : MultiRegionSelector {
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-11-08 | Review | Реализованы CaptureMode/HotkeyAction/HotkeySettings/HotkeyBinding (MULTI_REGION), RegionStitcher, ветка MULTI_REGION и onMultiRegion в CaptureCoordinator, MultiRegionOverlay и restoreHotkeys в FastCowScreenshotApp; тесты 1–15. build — BUILD SUCCESSFUL (RegionStitcherTest 3, CaptureCoordinatorTest 23, HotkeyBindingTest 9). Ручная проверка 1–9 выполнена пользователем: «Работает как описано». Отклонений нет. |

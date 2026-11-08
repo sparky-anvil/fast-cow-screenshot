@@ -6,6 +6,7 @@ import by.sparkyanvil.fastcowscreenshot.domain.PixelPoint
 import by.sparkyanvil.fastcowscreenshot.domain.PixelRect
 import by.sparkyanvil.fastcowscreenshot.domain.VirtualDesktop
 import by.sparkyanvil.fastcowscreenshot.settings.AppSettings
+import by.sparkyanvil.fastcowscreenshot.settings.MultiRegionSettings
 import by.sparkyanvil.fastcowscreenshot.storage.SaveResult
 import by.sparkyanvil.fastcowscreenshot.storage.ScreenshotSaver
 import io.mockk.every
@@ -51,8 +52,23 @@ class CaptureCoordinatorTest {
             onResult(nextRect)
     }
 
+    private class FakeMultiSelector : MultiRegionSelector {
+        var nextRects: List<PixelRect>? = null
+        var lastRequest: MultiRegionRequest? = null
+        override fun select(
+            frame: BufferedImage,
+            desktop: VirtualDesktop,
+            request: MultiRegionRequest,
+            onResult: (List<PixelRect>?) -> Unit,
+        ) {
+            lastRequest = request
+            onResult(nextRects)
+        }
+    }
+
     private val capturer = FakeCapturer()
     private val selector = FakeSelector()
+    private val multiSelector = FakeMultiSelector()
     private val monitors = mockk<MonitorProvider> {
         every { desktop() } returns desktop
         every { monitorUnderCursor(desktop) } returns b
@@ -69,7 +85,7 @@ class CaptureCoordinatorTest {
         settings: AppSettings = AppSettings(defaultDirectory = "C:\\s"),
         captureExecutor: Executor = direct,
     ) = CaptureCoordinator(
-        monitors, capturer, cursor, clipboard, saver, selector, notifier, last,
+        monitors, capturer, cursor, clipboard, saver, selector, multiSelector, notifier, last,
         { settings }, { time }, captureExecutor, direct, direct,
     )
 
@@ -205,5 +221,122 @@ class CaptureCoordinatorTest {
         c.trigger(CaptureMode.ALL_MONITORS)
         verify { notifier.showMessage("Не удалось сделать снимок", listOf("No monitors found")) }
         assertFalse(c.isBusy)
+    }
+
+    private fun enc(x: Int, y: Int) = ((x + 1000) shl 8) or y
+
+    private val diagonal = listOf(PixelRect(-100, 0, 10, 10), PixelRect(150, 50, 20, 10))
+
+    private fun runMulti(settings: AppSettings = AppSettings(defaultDirectory = "C:\\s")): BufferedImage {
+        val written = slot<BufferedImage>()
+        every { clipboard.write(capture(written)) } returns ClipboardResult.Success
+        multiSelector.nextRects = diagonal
+        coordinator(settings).trigger(CaptureMode.MULTI_REGION)
+        return written.captured
+    }
+
+    @Test
+    fun `multi region stitches diagonal regions`() {
+        val img = runMulti()
+        assertEquals(30, img.width)
+        assertEquals(20, img.height)
+        assertEquals(enc(-100, 0), img.getRGB(0, 0) and 0xFFFFFF)
+        assertEquals(enc(150, 50), img.getRGB(10, 10) and 0xFFFFFF)
+        assertEquals(0x808080, img.getRGB(0, 15) and 0xFFFFFF)
+        assertEquals(0x808080, img.getRGB(15, 5) and 0xFFFFFF)
+    }
+
+    @Test
+    fun `multi region uses configured fill color`() {
+        val img = runMulti(
+            AppSettings(defaultDirectory = "C:\\s", multiRegion = MultiRegionSettings(fillColor = "#FFFFFF")),
+        )
+        assertEquals(0xFFFFFF, img.getRGB(0, 15) and 0xFFFFFF)
+        assertEquals(0xFFFFFF, img.getRGB(15, 5) and 0xFFFFFF)
+    }
+
+    @Test
+    fun `multi region cancel touches nothing`() {
+        multiSelector.nextRects = null
+        val c = coordinator()
+        c.trigger(CaptureMode.MULTI_REGION)
+        assertNothingTouched(c)
+    }
+
+    @Test
+    fun `multi region empty after clipping is cancel`() {
+        multiSelector.nextRects = listOf(PixelRect(500, 500, 10, 10))
+        val c = coordinator()
+        c.trigger(CaptureMode.MULTI_REGION)
+        assertNothingTouched(c)
+    }
+
+    @Test
+    fun `multi region request reflects settings`() {
+        val mr = MultiRegionSettings(maxRegions = 25, confirmKey = "Space")
+        multiSelector.nextRects = null
+        coordinator(AppSettings(defaultDirectory = "C:\\s", multiRegion = mr)).trigger(CaptureMode.MULTI_REGION)
+        assertEquals(25, multiSelector.lastRequest?.maxRegions)
+        assertEquals(mr.keymap(), multiSelector.lastRequest?.keymap)
+    }
+
+    @Test
+    fun `single multi region equals region mode`() {
+        val rect = PixelRect(-50, 10, 20, 5)
+        val images = mutableListOf<BufferedImage>()
+        every { clipboard.write(capture(images)) } returns ClipboardResult.Success
+        selector.nextRect = rect
+        multiSelector.nextRects = listOf(rect)
+        coordinator().trigger(CaptureMode.REGION)
+        coordinator().trigger(CaptureMode.MULTI_REGION)
+        assertEquals(2, images.size)
+        val (x, y) = images
+        assertEquals(x.width, y.width)
+        assertEquals(x.height, y.height)
+        for (j in 0 until x.height) for (i in 0 until x.width) {
+            assertEquals(x.getRGB(i, j), y.getRGB(i, j))
+        }
+    }
+
+    @Test
+    fun `multi region cursor painted at moved position`() {
+        val snap = snapAt(155, 52)
+        every { cursor.snapshot() } returns snap
+        multiSelector.nextRects = diagonal
+        coordinator(AppSettings(defaultDirectory = "C:\\s", includeCursor = true)).trigger(CaptureMode.MULTI_REGION)
+        verify { cursor.paint(any(), snap, PixelPoint(140, 40)) }
+        verify(exactly = 1) { snap.close() }
+    }
+
+    @Test
+    fun `multi region cursor outside regions not painted`() {
+        val snap = snapAt(0, 90)
+        every { cursor.snapshot() } returns snap
+        multiSelector.nextRects = diagonal
+        coordinator(AppSettings(defaultDirectory = "C:\\s", includeCursor = true)).trigger(CaptureMode.MULTI_REGION)
+        verify(exactly = 0) { cursor.paint(any(), any(), any()) }
+        verify(exactly = 1) { snap.close() }
+    }
+
+    @Test
+    fun `multi region goes through pipeline`() {
+        multiSelector.nextRects = diagonal
+        val c = coordinator()
+        c.trigger(CaptureMode.MULTI_REGION)
+        assertEquals(CaptureMode.MULTI_REGION, last.get()?.mode)
+        verify { saver.save(any(), time, Path.of("C:\\s")) }
+        verify(exactly = 1) { notifier.showOutcome(any()) }
+        assertFalse(c.isBusy)
+    }
+
+    @Test
+    fun `multi region clips to desktop bounds`() {
+        multiSelector.nextRects = listOf(PixelRect(-150, 0, 100, 10))
+        val written = slot<BufferedImage>()
+        every { clipboard.write(capture(written)) } returns ClipboardResult.Success
+        coordinator().trigger(CaptureMode.MULTI_REGION)
+        assertEquals(50, written.captured.width)
+        assertEquals(10, written.captured.height)
+        assertEquals(enc(-100, 0), written.captured.getRGB(0, 0) and 0xFFFFFF)
     }
 }
