@@ -22,6 +22,7 @@ import by.sparkyanvil.fastcowscreenshot.settings.SettingsStore
 import by.sparkyanvil.fastcowscreenshot.storage.AutoSaver
 import by.sparkyanvil.fastcowscreenshot.storage.DirectoryValidator
 import by.sparkyanvil.fastcowscreenshot.storage.PngFileWriter
+import by.sparkyanvil.fastcowscreenshot.ui.MultiRegionOverlay
 import by.sparkyanvil.fastcowscreenshot.ui.NotificationWindow
 import by.sparkyanvil.fastcowscreenshot.ui.RegionOverlay
 import by.sparkyanvil.fastcowscreenshot.ui.SaveAsAction
@@ -61,6 +62,7 @@ internal class FastCowScreenshotApp {
         WindowsClipboardWriter({ loop.messageWindow }),
         AutoSaver(),
         RegionOverlay(),
+        MultiRegionOverlay({ hotkeys.unregisterAll() }, { restoreHotkeys() }),
         notifier,
         last,
         { store.current },
@@ -121,6 +123,12 @@ internal class FastCowScreenshotApp {
             throw e
         }
         log.info("Application started, settings: {}", settingsFile)
+    }
+
+    /** Повторная регистрация глобальных клавиш после закрытия оверлея «Несколько областей». Вызывается на EDT. */
+    private fun restoreHotkeys() {
+        val failed = controller.registerAll()
+        if (failed.isNotEmpty()) log.warn("Hotkeys not restored after overlay: {}", failed)
     }
 
     /** Выход. Вызывать на EDT. */

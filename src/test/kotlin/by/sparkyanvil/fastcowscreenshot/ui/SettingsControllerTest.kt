@@ -4,6 +4,10 @@ import by.sparkyanvil.fastcowscreenshot.capture.HotkeyService
 import by.sparkyanvil.fastcowscreenshot.settings.DefaultDirectoryProvider
 import by.sparkyanvil.fastcowscreenshot.settings.HotkeyAction
 import by.sparkyanvil.fastcowscreenshot.settings.HotkeyBinding
+import by.sparkyanvil.fastcowscreenshot.settings.KeySlot
+import by.sparkyanvil.fastcowscreenshot.settings.MultiRegionSettings
+import by.sparkyanvil.fastcowscreenshot.settings.OverlayAction
+import by.sparkyanvil.fastcowscreenshot.settings.OverlayKey
 import by.sparkyanvil.fastcowscreenshot.settings.SettingsRepository
 import by.sparkyanvil.fastcowscreenshot.settings.SettingsStore
 import io.mockk.every
@@ -130,5 +134,133 @@ class SettingsControllerTest {
     fun `recording unregisters all`() {
         controller().beginHotkeyRecording()
         verify { hotkeys.unregisterAll() }
+    }
+
+    private val enter = OverlayKey(false, false, false, 10)
+
+    @Test
+    fun `overlay key conflict is rejected`() {
+        assertEquals(
+            "Сочетание Enter уже назначено действию «Собрать снимок»",
+            controller().applyOverlayKey(OverlayAction.CANCEL, KeySlot.PRIMARY, enter),
+        )
+        assertEquals("Esc", store.current.multiRegion.cancelKey)
+    }
+
+    @Test
+    fun `overlay key conflict with secondary slot`() {
+        assertEquals(
+            "Сочетание Ctrl+Z уже назначено действию «Удалить последнюю область»",
+            controller().applyOverlayKey(OverlayAction.CANCEL, KeySlot.SECONDARY, OverlayKey(true, false, false, 0x5A)),
+        )
+    }
+
+    @Test
+    fun `overlay key is saved`() {
+        assertNull(controller().applyOverlayKey(OverlayAction.CANCEL, KeySlot.SECONDARY, OverlayKey(false, false, false, 0x51)))
+        assertEquals("Q", store.current.multiRegion.cancelKeyAlt)
+        val loaded = SettingsRepository(tempDir.resolve("settings.json"), defaults).load()
+        assertEquals("Q", loaded.multiRegion.cancelKeyAlt)
+    }
+
+    @Test
+    fun `same key in same slot is not a conflict`() {
+        assertNull(controller().applyOverlayKey(OverlayAction.CONFIRM, KeySlot.PRIMARY, enter))
+    }
+
+    @Test
+    fun `swapping keys is possible via free key`() {
+        val c = controller()
+        assertNull(c.applyOverlayKey(OverlayAction.CANCEL, KeySlot.PRIMARY, OverlayKey(false, false, false, 0x74)))
+        assertNull(c.applyOverlayKey(OverlayAction.CONFIRM, KeySlot.PRIMARY, OverlayKey(false, false, false, 27)))
+        assertNull(c.applyOverlayKey(OverlayAction.CANCEL, KeySlot.PRIMARY, enter))
+        assertEquals("Esc", store.current.multiRegion.confirmKey)
+        assertEquals("Enter", store.current.multiRegion.cancelKey)
+    }
+
+    @Test
+    fun `secondary can be cleared`() {
+        assertNull(controller().applyOverlayKey(OverlayAction.REMOVE_LAST, KeySlot.SECONDARY, null))
+        assertEquals("", store.current.multiRegion.removeLastKeyAlt)
+    }
+
+    @Test
+    fun `primary cannot be cleared`() {
+        assertEquals(
+            "Основное сочетание обязательно",
+            controller().applyOverlayKey(OverlayAction.CONFIRM, KeySlot.PRIMARY, null),
+        )
+        assertEquals("Enter", store.current.multiRegion.confirmKey)
+    }
+
+    @Test
+    fun `max regions validation`() {
+        val c = controller()
+        for (v in listOf("0", "51", "abc", "")) {
+            assertEquals("Максимум областей — целое число от 2 до 50", c.setMaxRegions(v), v)
+        }
+        assertEquals(10, store.current.multiRegion.maxRegions)
+    }
+
+    @Test
+    fun `max regions saved`() {
+        assertNull(controller().setMaxRegions(" 25 "))
+        assertEquals(25, store.current.multiRegion.maxRegions)
+    }
+
+    @Test
+    fun `fill color validation`() {
+        val c = controller()
+        assertEquals("Цвет — в формате #RRGGBB, например #808080", c.setFillColor("#GGG"))
+        assertEquals("Цвет — в формате #RRGGBB, например #808080", c.setFillColor("808080"))
+        assertEquals("#808080", store.current.multiRegion.fillColor)
+    }
+
+    @Test
+    fun `fill color normalized to upper case`() {
+        assertNull(controller().setFillColor("#ff00aa"))
+        assertEquals("#FF00AA", store.current.multiRegion.fillColor)
+    }
+
+    @Test
+    fun `multi region hotkey conflicts with region mode`() {
+        assertEquals(
+            "Сочетание Ctrl+Shift+3 уже используется для режима «Область»",
+            controller().applyHotkey(HotkeyAction.MULTI_REGION, HotkeyBinding(true, false, true, '3'.code)),
+        )
+    }
+
+    private fun customizeMultiRegion() {
+        store.update {
+            it.copy(
+                multiRegion = MultiRegionSettings(maxRegions = 25, fillColor = "#FFFFFF", cancelKey = "F5"),
+                hotkeys = it.hotkeys.with(HotkeyAction.MULTI_REGION, "Ctrl+Alt+M"),
+            )
+        }
+    }
+
+    @Test
+    fun `reset restores defaults`() {
+        customizeMultiRegion()
+        assertNull(controller().resetMultiRegion())
+        assertEquals(MultiRegionSettings(), store.current.multiRegion)
+        assertEquals("Ctrl+Shift+4", store.current.hotkeyBinding(HotkeyAction.MULTI_REGION).format())
+        verify { hotkeys.register(HotkeyAction.MULTI_REGION, HotkeyBinding.defaultFor(HotkeyAction.MULTI_REGION)) }
+    }
+
+    @Test
+    fun `reset keeps hotkey when default is taken`() {
+        every {
+            hotkeys.register(HotkeyAction.MULTI_REGION, HotkeyBinding.defaultFor(HotkeyAction.MULTI_REGION))
+        } returns false
+        customizeMultiRegion()
+        assertEquals("Сочетание Ctrl+Shift+4 занято другим приложением", controller().resetMultiRegion())
+        assertEquals(MultiRegionSettings(), store.current.multiRegion)
+    }
+
+    @Test
+    fun `register all includes multi region`() {
+        controller().registerAll()
+        verify { hotkeys.register(HotkeyAction.MULTI_REGION, any()) }
     }
 }

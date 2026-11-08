@@ -7,4 +7,5 @@ internal enum class HotkeyAction(val displayName: String, val mode: CaptureMode)
     MONITOR_UNDER_CURSOR("Монитор под курсором", CaptureMode.MONITOR_UNDER_CURSOR),
     ALL_MONITORS("Все мониторы", CaptureMode.ALL_MONITORS),
     REGION("Область", CaptureMode.REGION),
+    MULTI_REGION("Несколько областей", CaptureMode.MULTI_REGION),
 }

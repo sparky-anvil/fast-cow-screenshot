@@ -66,7 +66,7 @@ internal data class HotkeyBinding(val ctrl: Boolean, val alt: Boolean, val shift
             return HotkeyBinding(ctrl, alt, shift, keyCode)
         }
 
-        /** Значения по умолчанию REQ-001.52: Ctrl+Shift+1 / 2 / 3. */
+        /** Значения по умолчанию REQ-001.52: Ctrl+Shift+1 / 2 / 3 / 4. */
         fun defaultFor(action: HotkeyAction): HotkeyBinding = HotkeyBinding(
             ctrl = true,
             alt = false,
@@ -75,6 +75,7 @@ internal data class HotkeyBinding(val ctrl: Boolean, val alt: Boolean, val shift
                 HotkeyAction.MONITOR_UNDER_CURSOR -> '1'.code
                 HotkeyAction.ALL_MONITORS -> '2'.code
                 HotkeyAction.REGION -> '3'.code
+                HotkeyAction.MULTI_REGION -> '4'.code
             },
         )
 

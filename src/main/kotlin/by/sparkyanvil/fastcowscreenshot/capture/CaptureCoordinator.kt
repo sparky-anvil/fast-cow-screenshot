@@ -5,6 +5,7 @@ import by.sparkyanvil.fastcowscreenshot.domain.PixelPoint
 import by.sparkyanvil.fastcowscreenshot.domain.PixelRect
 import by.sparkyanvil.fastcowscreenshot.domain.Screenshot
 import by.sparkyanvil.fastcowscreenshot.domain.SelectionGeometry
+import by.sparkyanvil.fastcowscreenshot.domain.StitchLayout
 import by.sparkyanvil.fastcowscreenshot.domain.VirtualDesktop
 import by.sparkyanvil.fastcowscreenshot.settings.AppSettings
 import by.sparkyanvil.fastcowscreenshot.storage.IoErrorMessages
@@ -29,6 +30,7 @@ internal class CaptureCoordinator(
     private val clipboard: ClipboardWriter,
     private val saver: ScreenshotSaver,
     private val regionSelector: RegionSelector,
+    private val multiRegionSelector: MultiRegionSelector,
     private val notifier: CaptureNotifier,
     private val lastScreenshot: LastScreenshotHolder,
     private val settings: () -> AppSettings,
@@ -81,6 +83,16 @@ internal class CaptureCoordinator(
                         }
                     }
                 }
+                CaptureMode.MULTI_REGION -> {
+                    val frame = capturer.capture(desktop.bounds, desktop)
+                    val request = MultiRegionRequest(s.multiRegion.effectiveMaxRegions(), s.multiRegion.keymap())
+                    handedOver = true
+                    uiExecutor.execute {
+                        multiRegionSelector.select(frame, desktop, request) { rects ->
+                            onMultiRegion(rects, frame, desktop, snap, capturedAt, s, start)
+                        }
+                    }
+                }
             }
         } catch (e: Exception) {
             fail(e)
@@ -122,6 +134,51 @@ internal class CaptureCoordinator(
                         cursor.paint(image, snap, PixelPoint(clipped.left, clipped.top))
                     }
                     finish(image, mode, capturedAt, s, start)
+                } catch (e: Exception) {
+                    fail(e)
+                } finally {
+                    snap?.close()
+                }
+            }
+        } catch (e: RejectedExecutionException) {
+            busy.set(false)
+            snap?.close()
+        }
+    }
+
+    private fun onMultiRegion(
+        rects: List<PixelRect>?,
+        frame: BufferedImage,
+        desktop: VirtualDesktop,
+        snap: CursorSnapshot?,
+        capturedAt: LocalDateTime,
+        s: AppSettings,
+        start: Long,
+    ) {
+        val confirmNs = System.nanoTime()
+        try {
+            captureExecutor.execute {
+                try {
+                    val clipped = rects
+                        ?.mapNotNull { it.intersect(desktop.bounds) }
+                        ?.filterNot { SelectionGeometry.isCancelled(it) }
+                    if (clipped == null || clipped.isEmpty()) {
+                        log.info("Multi-region capture cancelled")
+                        busy.set(false)
+                        return@execute
+                    }
+                    val origin = PixelPoint(desktop.bounds.left, desktop.bounds.top)
+                    val layout = StitchLayout.compute(clipped)
+                    val image = RegionStitcher.stitch(frame, origin, layout, s.multiRegion.fillRgb())
+                    log.info("Multi-region stitched {} regions into {}x{}", clipped.size, image.width, image.height)
+                    if (snap != null) {
+                        val p = layout.placements.firstOrNull { it.source.contains(snap.hotspot) }
+                        if (p != null) {
+                            cursor.paint(image, snap, PixelPoint(p.source.left - p.targetLeft, p.source.top - p.targetTop))
+                        }
+                    }
+                    finish(image, CaptureMode.MULTI_REGION, capturedAt, s, start)
+                    log.info("Multi-region confirm-to-clipboard {} ms", (System.nanoTime() - confirmNs) / 1_000_000)
                 } catch (e: Exception) {
                     fail(e)
                 } finally {
