@@ -1,11 +1,15 @@
 package by.sparkyanvil.fastcowscreenshot.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -27,6 +31,7 @@ import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isAltPressed
 import androidx.compose.ui.input.key.isCtrlPressed
@@ -40,6 +45,9 @@ import androidx.compose.ui.unit.dp
 import by.sparkyanvil.fastcowscreenshot.platform.windows.WindowHandles
 import by.sparkyanvil.fastcowscreenshot.settings.AppSettings
 import by.sparkyanvil.fastcowscreenshot.settings.HotkeyAction
+import by.sparkyanvil.fastcowscreenshot.settings.KeySlot
+import by.sparkyanvil.fastcowscreenshot.settings.MultiRegionSettings
+import by.sparkyanvil.fastcowscreenshot.settings.OverlayAction
 import by.sparkyanvil.fastcowscreenshot.settings.SettingsStore
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -98,7 +106,7 @@ internal class SettingsWindow(private val controller: SettingsController, privat
     companion object {
         const val TITLE: String = "Настройки — fast-cow-screenshot"
         const val WIDTH: Int = 600
-        const val HEIGHT: Int = 460
+        const val HEIGHT: Int = 760
     }
 }
 
@@ -115,10 +123,15 @@ internal fun SettingsContent(
     var hotkeyError by remember { mutableStateOf<String?>(null) }
     var generalError by remember { mutableStateOf<String?>(null) }
     var recordingAction by recording
+    var multiError by remember { mutableStateOf<String?>(null) }
+    var overlayTarget by remember { mutableStateOf<Pair<OverlayAction, KeySlot>?>(null) }
+    var maxText by remember(s.multiRegion.maxRegions) { mutableStateOf(s.multiRegion.maxRegions.toString()) }
+    var colorText by remember(s.multiRegion.fillColor) { mutableStateOf(s.multiRegion.fillColor) }
+    val anyRecording = recordingAction != null || overlayTarget != null
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(recordingAction) {
-        if (recordingAction != null) focusRequester.requestFocus()
+    LaunchedEffect(recordingAction, overlayTarget) {
+        if (recordingAction != null || overlayTarget != null) focusRequester.requestFocus()
     }
 
     MaterialTheme {
@@ -127,6 +140,22 @@ internal fun SettingsContent(
                 .focusRequester(focusRequester)
                 .focusable()
                 .onPreviewKeyEvent { e ->
+                    val target = overlayTarget
+                    if (target != null) {
+                        if (e.type != KeyEventType.KeyDown) return@onPreviewKeyEvent true
+                        when (
+                            val step = OverlayKeyRecorder.onKeyDown(
+                                e.isCtrlPressed, e.isAltPressed, e.isShiftPressed, e.key.nativeKeyCode, e.key == Key.NumPadEnter,
+                            )
+                        ) {
+                            OverlayRecordingStep.Wait -> return@onPreviewKeyEvent true
+                            OverlayRecordingStep.Invalid -> multiError = SettingsController.ERR_OVERLAY_INVALID
+                            is OverlayRecordingStep.Apply ->
+                                multiError = controller.applyOverlayKey(target.first, target.second, step.key)
+                        }
+                        overlayTarget = null
+                        return@onPreviewKeyEvent true
+                    }
                     val action = recordingAction
                     if (action == null || e.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
                     val step = HotkeyRecorder.onKeyDown(
@@ -171,23 +200,112 @@ internal fun SettingsContent(
                 }
 
                 Text("Горячие клавиши", fontWeight = FontWeight.Bold)
-                for (action in HotkeyAction.entries) {
-                    Row {
-                        Text(action.displayName, Modifier.width(200.dp))
-                        Text(
-                            if (recordingAction == action) "Нажмите сочетание… (Esc — отмена)" else s.hotkeyBinding(action).format(),
-                            Modifier.width(240.dp),
-                        )
-                        OutlinedButton(onClick = {
-                            recordingAction = action
-                            hotkeyError = null
-                            controller.beginHotkeyRecording()
-                        }) { Text("Изменить") }
+                for (action in HotkeyAction.entries.filter { it != HotkeyAction.MULTI_REGION }) {
+                    HotkeyRow(action, s, recording, enabled = true) {
+                        recordingAction = action
+                        hotkeyError = null
+                        controller.beginHotkeyRecording()
                     }
                 }
                 hotkeyError?.let { Text(it, color = ERROR_COLOR) }
                 generalError?.let { Text(it, color = ERROR_COLOR) }
+
+                Text("Несколько областей", fontWeight = FontWeight.Bold)
+                HotkeyRow(HotkeyAction.MULTI_REGION, s, recording, enabled = !anyRecording) {
+                    recordingAction = HotkeyAction.MULTI_REGION
+                    hotkeyError = null
+                    controller.beginHotkeyRecording()
+                }
+                for (a in OverlayAction.entries) {
+                    Row {
+                        Text(a.displayName, Modifier.width(200.dp))
+                        for (slot in KeySlot.entries) {
+                            val label = when {
+                                overlayTarget == a to slot -> "Нажмите клавишу…"
+                                else -> s.multiRegion.key(a, slot).ifEmpty { "—" }
+                            }
+                            Text(label, Modifier.width(120.dp))
+                            if (overlayTarget == a to slot) {
+                                OutlinedButton(onClick = { overlayTarget = null }) { Text("Отменить") }
+                            } else {
+                                OutlinedButton(
+                                    enabled = !anyRecording,
+                                    onClick = {
+                                        multiError = null
+                                        overlayTarget = a to slot
+                                    },
+                                ) { Text("Изменить") }
+                            }
+                        }
+                        OutlinedButton(
+                            enabled = !anyRecording && s.multiRegion.key(a, KeySlot.SECONDARY).isNotEmpty(),
+                            onClick = { multiError = controller.applyOverlayKey(a, KeySlot.SECONDARY, null) },
+                        ) { Text("Очистить") }
+                    }
+                }
+                Row {
+                    Text("Максимум областей (2–50)", Modifier.width(200.dp))
+                    OutlinedTextField(
+                        value = maxText,
+                        onValueChange = { maxText = it },
+                        singleLine = true,
+                        modifier = Modifier.width(100.dp),
+                    )
+                    Button(onClick = { multiError = controller.setMaxRegions(maxText) }) { Text("Применить") }
+                }
+                Row {
+                    Text("Цвет заливки", Modifier.width(200.dp))
+                    Box(
+                        Modifier.size(24.dp)
+                            .background(Color(0xFF000000 or s.multiRegion.fillRgb().toLong()))
+                            .border(1.dp, Color.Gray),
+                    )
+                    OutlinedTextField(
+                        value = colorText,
+                        onValueChange = { colorText = it },
+                        singleLine = true,
+                        modifier = Modifier.width(120.dp),
+                    )
+                    Button(onClick = { multiError = controller.setFillColor(colorText) }) { Text("Применить") }
+                }
+                Row {
+                    for (hex in SettingsController.FILL_PALETTE) {
+                        val rgb = MultiRegionSettings.parseHexColor(hex) ?: continue
+                        Box(
+                            Modifier.padding(2.dp).size(24.dp)
+                                .background(Color(0xFF000000 or rgb.toLong()))
+                                .border(1.dp, Color.Gray)
+                                .clickable { multiError = controller.setFillColor(hex) },
+                        )
+                    }
+                }
+                OutlinedButton(
+                    enabled = !anyRecording,
+                    onClick = {
+                        overlayTarget = null
+                        multiError = controller.resetMultiRegion()
+                    },
+                ) { Text("Сбросить") }
+                multiError?.let { Text(it, color = ERROR_COLOR) }
             }
         }
+    }
+}
+
+@Composable
+private fun HotkeyRow(
+    action: HotkeyAction,
+    s: AppSettings,
+    recording: MutableState<HotkeyAction?>,
+    enabled: Boolean,
+    onStart: () -> Unit,
+) {
+    Row {
+        Text(action.displayName, Modifier.width(200.dp))
+        Text(
+            if (recording.value == action) "Нажмите сочетание… (Esc — отмена)" else s.hotkeyBinding(action).format(),
+            Modifier.width(240.dp),
+        )
+        OutlinedButton(enabled = enabled, onClick = { onStart() }) { Text("Изменить") }
     }
 }

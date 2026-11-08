@@ -62,8 +62,8 @@
 | [TASK-024](tasks/TASK-024-multi-region-settings-model.md) | Настройки режима и клавиши оверлея | TDD-003 | — | M | Done |
 | [TASK-025](tasks/TASK-025-multi-selection-state.md) | Состояние выделения, `MultiRegionSelector` | TDD-003 | 024 | M | Done |
 | [TASK-026](tasks/TASK-026-multi-region-overlay.md) | Оверлей `MultiRegionOverlay` | TDD-003 | 025 | L | Done |
-| [TASK-027](tasks/TASK-027-multi-region-capture-mode.md) | Режим `MULTI_REGION`: координатор, склейка, подключение | TDD-003 | 023, 024, 026 | L | Review |
-| [TASK-028](tasks/TASK-028-multi-region-settings-ui.md) | Раздел настроек «Несколько областей» | TDD-003 | 027 | L | Ready |
+| [TASK-027](tasks/TASK-027-multi-region-capture-mode.md) | Режим `MULTI_REGION`: координатор, склейка, подключение | TDD-003 | 023, 024, 026 | L | Done |
+| [TASK-028](tasks/TASK-028-multi-region-settings-ui.md) | Раздел настроек «Несколько областей» | TDD-003 | 027 | L | Review |
 | [TASK-029](tasks/TASK-029-multi-region-acceptance.md) | Приёмка и замеры NFR режима | TDD-003 | 028 | S | Ready |
 
 ## Порядок выполнения
