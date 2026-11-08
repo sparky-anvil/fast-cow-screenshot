@@ -22,6 +22,7 @@
 |---|---|---|---|
 | [REQ-001](requirements/REQ-001-screen-capture-clipboard-save.md) | Захват экрана с учётом мультимонитора, автокопирование в буфер и сохранение файлов | Must | Review |
 | [REQ-002](requirements/REQ-002-multi-region-capture.md) | Режим «Несколько областей»: выделение нескольких регионов и склейка в одно изображение | Should | Approved |
+| [REQ-003](requirements/REQ-003-screenshot-editor.md) | Редактор снимков: рисование карандашом, перемещение и склейка областей | Should | Draft |
 
 ## User stories
 
@@ -37,6 +38,10 @@
 | [US-008](user-stories/US-008-select-multiple-regions.md) | Выделение нескольких областей на экране | REQ-002 | Approved |
 | [US-009](user-stories/US-009-stitch-regions.md) | Склейка нескольких областей в одно изображение | REQ-002 | Approved |
 | [US-010](user-stories/US-010-multi-region-settings.md) | Настройки режима «Несколько областей» | REQ-002 | Approved |
+| [US-011](user-stories/US-011-editor-toggle-and-finish.md) | Включение редактора и завершение редактирования | REQ-003 | Draft |
+| [US-012](user-stories/US-012-editor-pencil.md) | Рисование карандашом по снимку | REQ-003 | Draft |
+| [US-013](user-stories/US-013-editor-move-and-stitch-regions.md) | Перемещение и склейка областей в редакторе | REQ-003 | Draft |
+| [US-014](user-stories/US-014-editor-zoom.md) | Масштаб и прокрутка в редакторе | REQ-003 | Draft |
 
 ## Архитектурные решения
 
