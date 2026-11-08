@@ -64,7 +64,8 @@
 | [TASK-026](tasks/TASK-026-multi-region-overlay.md) | Оверлей `MultiRegionOverlay` | TDD-003 | 025 | L | Done |
 | [TASK-027](tasks/TASK-027-multi-region-capture-mode.md) | Режим `MULTI_REGION`: координатор, склейка, подключение | TDD-003 | 023, 024, 026 | L | Done |
 | [TASK-028](tasks/TASK-028-multi-region-settings-ui.md) | Раздел настроек «Несколько областей» | TDD-003 | 027 | L | Review |
-| [TASK-029](tasks/TASK-029-multi-region-acceptance.md) | Приёмка и замеры NFR режима | TDD-003 | 028 | S | Ready |
+| [TASK-029](tasks/TASK-029-multi-region-acceptance.md) | Приёмка и замеры NFR режима | TDD-003 | 030 | S | Ready |
+| [TASK-030](tasks/TASK-030-multi-region-settings-grid-layout.md) | Раскладка раздела «Несколько областей» таблицей (замечание к TASK-028) | TDD-003 | 028 | S | Review |
 
 ## Порядок выполнения
 
@@ -76,7 +77,7 @@ TASK-002/003/005 и TASK-011/012/013 между собой независимы.
 Релиз (TDD-002): TASK-020 → 021 → 022. Перед TASK-022 изменения TASK-020/021 должны быть закоммичены и отправлены
 в `main` (предусловия TASK-022).
 
-Несколько областей (TDD-003): TASK-023 и TASK-024 независимы; затем 024 → 025 → 026; 023 + 026 → 027 → 028 → 029.
+Несколько областей (TDD-003): TASK-023 и TASK-024 независимы; затем 024 → 025 → 026; 023 + 026 → 027 → 028 → 030 → 029.
 
 ## Запросы уточнения
 

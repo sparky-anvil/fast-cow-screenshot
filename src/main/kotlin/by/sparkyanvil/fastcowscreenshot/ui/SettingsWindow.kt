@@ -6,7 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.focus.FocusRequester
@@ -41,6 +44,7 @@ import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import by.sparkyanvil.fastcowscreenshot.platform.windows.WindowHandles
 import by.sparkyanvil.fastcowscreenshot.settings.AppSettings
@@ -105,12 +109,19 @@ internal class SettingsWindow(private val controller: SettingsController, privat
 
     companion object {
         const val TITLE: String = "Настройки — fast-cow-screenshot"
-        const val WIDTH: Int = 600
-        const val HEIGHT: Int = 760
+        const val WIDTH: Int = 760
+        const val HEIGHT: Int = 800
     }
 }
 
 private val ERROR_COLOR = Color(0xFFD32F2F)
+
+private val COL_LABEL = 200.dp // столбец «Действие»
+private val COL_PRIMARY = 200.dp // столбец «Основная»
+private val COL_SECONDARY = 296.dp // столбец «Дополнительная»
+private val CELL_TEXT = 104.dp // значение клавиши / поле ввода внутри ячейки
+private val CELL_BUTTON = 96.dp // кнопка внутри ячейки
+private val SWATCH = 24.dp // образец цвета
 
 /** Содержимое окна настроек. */
 @Composable
@@ -211,81 +222,114 @@ internal fun SettingsContent(
                 generalError?.let { Text(it, color = ERROR_COLOR) }
 
                 Text("Несколько областей", fontWeight = FontWeight.Bold)
-                HotkeyRow(HotkeyAction.MULTI_REGION, s, recording, enabled = !anyRecording) {
-                    recordingAction = HotkeyAction.MULTI_REGION
-                    hotkeyError = null
-                    controller.beginHotkeyRecording()
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Действие", Modifier.width(COL_LABEL), color = Color.Gray)
+                    Text("Основная", Modifier.width(COL_PRIMARY), color = Color.Gray)
+                    Text("Дополнительная", Modifier.width(COL_SECONDARY), color = Color.Gray)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Горячая клавиша запуска", Modifier.width(COL_LABEL))
+                    Row(Modifier.width(COL_PRIMARY), verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            s.hotkeyBinding(HotkeyAction.MULTI_REGION).format(),
+                            Modifier.width(CELL_TEXT),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        CellButton("Изменить", enabled = !anyRecording) {
+                            recordingAction = HotkeyAction.MULTI_REGION
+                            hotkeyError = null
+                            controller.beginHotkeyRecording()
+                        }
+                    }
+                    if (recordingAction == HotkeyAction.MULTI_REGION) {
+                        Text("Нажмите сочетание… (Esc — отмена)", Modifier.width(COL_SECONDARY))
+                    }
                 }
                 for (a in OverlayAction.entries) {
-                    Row {
-                        Text(a.displayName, Modifier.width(200.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(a.displayName, Modifier.width(COL_LABEL))
                         for (slot in KeySlot.entries) {
-                            val label = when {
-                                overlayTarget == a to slot -> "Нажмите клавишу…"
-                                else -> s.multiRegion.key(a, slot).ifEmpty { "—" }
-                            }
-                            Text(label, Modifier.width(120.dp))
-                            if (overlayTarget == a to slot) {
-                                OutlinedButton(onClick = { overlayTarget = null }) { Text("Отменить") }
-                            } else {
-                                OutlinedButton(
-                                    enabled = !anyRecording,
-                                    onClick = {
+                            val active = overlayTarget == a to slot
+                            Row(
+                                Modifier.width(if (slot == KeySlot.PRIMARY) COL_PRIMARY else COL_SECONDARY),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    if (active) "Нажмите…" else s.multiRegion.key(a, slot).ifEmpty { "—" },
+                                    Modifier.width(CELL_TEXT),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                if (active) {
+                                    CellButton("Отменить") { overlayTarget = null }
+                                } else {
+                                    CellButton("Изменить", enabled = !anyRecording) {
                                         multiError = null
                                         overlayTarget = a to slot
-                                    },
-                                ) { Text("Изменить") }
+                                    }
+                                }
+                                if (slot == KeySlot.SECONDARY) {
+                                    CellButton(
+                                        "Очистить",
+                                        enabled = !anyRecording && s.multiRegion.key(a, KeySlot.SECONDARY).isNotEmpty(),
+                                    ) { multiError = controller.applyOverlayKey(a, KeySlot.SECONDARY, null) }
+                                }
                             }
                         }
-                        OutlinedButton(
-                            enabled = !anyRecording && s.multiRegion.key(a, KeySlot.SECONDARY).isNotEmpty(),
-                            onClick = { multiError = controller.applyOverlayKey(a, KeySlot.SECONDARY, null) },
-                        ) { Text("Очистить") }
                     }
                 }
-                Row {
-                    Text("Максимум областей (2–50)", Modifier.width(200.dp))
-                    OutlinedTextField(
-                        value = maxText,
-                        onValueChange = { maxText = it },
-                        singleLine = true,
-                        modifier = Modifier.width(100.dp),
-                    )
-                    Button(onClick = { multiError = controller.setMaxRegions(maxText) }) { Text("Применить") }
-                }
-                Row {
-                    Text("Цвет заливки", Modifier.width(200.dp))
-                    Box(
-                        Modifier.size(24.dp)
-                            .background(Color(0xFF000000 or s.multiRegion.fillRgb().toLong()))
-                            .border(1.dp, Color.Gray),
-                    )
-                    OutlinedTextField(
-                        value = colorText,
-                        onValueChange = { colorText = it },
-                        singleLine = true,
-                        modifier = Modifier.width(120.dp),
-                    )
-                    Button(onClick = { multiError = controller.setFillColor(colorText) }) { Text("Применить") }
-                }
-                Row {
-                    for (hex in SettingsController.FILL_PALETTE) {
-                        val rgb = MultiRegionSettings.parseHexColor(hex) ?: continue
-                        Box(
-                            Modifier.padding(2.dp).size(24.dp)
-                                .background(Color(0xFF000000 or rgb.toLong()))
-                                .border(1.dp, Color.Gray)
-                                .clickable { multiError = controller.setFillColor(hex) },
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Максимум областей (2–50)", Modifier.width(COL_LABEL))
+                    Row(Modifier.width(COL_PRIMARY), verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = maxText,
+                            onValueChange = { maxText = it },
+                            singleLine = true,
+                            modifier = Modifier.width(CELL_TEXT),
                         )
+                        CellButton("Применить", filled = true) { multiError = controller.setMaxRegions(maxText) }
                     }
                 }
-                OutlinedButton(
-                    enabled = !anyRecording,
-                    onClick = {
-                        overlayTarget = null
-                        multiError = controller.resetMultiRegion()
-                    },
-                ) { Text("Сбросить") }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Цвет заливки", Modifier.width(COL_LABEL))
+                    Row(Modifier.width(COL_PRIMARY), verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = colorText,
+                            onValueChange = { colorText = it },
+                            singleLine = true,
+                            modifier = Modifier.width(CELL_TEXT),
+                        )
+                        CellButton("Применить", filled = true) { multiError = controller.setFillColor(colorText) }
+                    }
+                    Row(Modifier.width(COL_SECONDARY), verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier.size(SWATCH)
+                                .background(Color(0xFF000000 or s.multiRegion.fillRgb().toLong()))
+                                .border(2.dp, Color.Black),
+                        )
+                        Spacer(Modifier.width(16.dp))
+                        for (hex in SettingsController.FILL_PALETTE) {
+                            val rgb = MultiRegionSettings.parseHexColor(hex) ?: continue
+                            Box(
+                                Modifier.padding(2.dp).size(SWATCH)
+                                    .background(Color(0xFF000000 or rgb.toLong()))
+                                    .border(1.dp, Color.Gray)
+                                    .clickable { multiError = controller.setFillColor(hex) },
+                            )
+                        }
+                    }
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(Modifier.width(COL_LABEL))
+                    OutlinedButton(
+                        enabled = !anyRecording,
+                        onClick = {
+                            overlayTarget = null
+                            multiError = controller.resetMultiRegion()
+                        },
+                    ) { Text("Сбросить") }
+                }
                 multiError?.let { Text(it, color = ERROR_COLOR) }
             }
         }
@@ -307,5 +351,21 @@ private fun HotkeyRow(
             Modifier.width(240.dp),
         )
         OutlinedButton(enabled = enabled, onClick = { onStart() }) { Text("Изменить") }
+    }
+}
+
+/** Кнопка ячейки таблицы фиксированной ширины CELL_BUTTON. filled = true — Button, иначе OutlinedButton. */
+@Composable
+private fun CellButton(text: String, enabled: Boolean = true, filled: Boolean = false, onClick: () -> Unit) {
+    val modifier = Modifier.width(CELL_BUTTON)
+    val padding = PaddingValues(horizontal = 4.dp)
+    if (filled) {
+        Button(onClick = onClick, modifier = modifier, enabled = enabled, contentPadding = padding) {
+            Text(text, maxLines = 1)
+        }
+    } else {
+        OutlinedButton(onClick = onClick, modifier = modifier, enabled = enabled, contentPadding = padding) {
+            Text(text, maxLines = 1)
+        }
     }
 }
