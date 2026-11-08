@@ -1,8 +1,8 @@
-# TASK-025: Реализовать состояние выделения нескольких областей и интерфейс `MultiRegionSelector`
+﻿# TASK-025: Реализовать состояние выделения нескольких областей и интерфейс `MultiRegionSelector`
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Review |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-003 §5, §7.1 |
@@ -259,9 +259,9 @@ Helper `add(s, x1, y1, x2, y2)` = `s.press(p(x1,y1)); s.drag(p(x2,y2)); s.releas
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Сигнатуры совпадают с разделом 6; `MultiSelectionState.kt` не импортирует `java.awt` и `javax.swing`.
-- [ ] 17 тестов проходят.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Сигнатуры совпадают с разделом 6; `MultiSelectionState.kt` не импортирует `java.awt` и `javax.swing`.
+- [x] 17 тестов проходят.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -279,4 +279,4 @@ Helper `add(s, x1, y1, x2, y2)` = `s.press(p(x1,y1)); s.drag(p(x2,y2)); s.releas
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-11-08 | Review | Реализованы MultiRegionRequest, MultiRegionSelector, MultiSelectionState и 17 тестов. build — BUILD SUCCESSFUL. Отклонений нет. |
