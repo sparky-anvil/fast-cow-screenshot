@@ -3,8 +3,8 @@
 | Поле | Значение |
 |---|---|
 | Автор | Tech |
-| Дата последнего изменения | 2026-11-08 |
-| Связанные ADR | ADR-001, ADR-002, ADR-003, ADR-004, ADR-005 |
+| Дата последнего изменения | 2026-11-15 |
+| Связанные ADR | ADR-001, ADR-002, ADR-003, ADR-004, ADR-005, ADR-006 |
 
 > Единый источник правды для Dev. Каждая задача (TASK) предполагает, что исполнитель прочитал этот документ.
 > Всё, что здесь записано, обязательно, если в задаче явно не сказано иное.
@@ -55,9 +55,10 @@ fast-cow-screenshot/
 │   │   ├── settings/               # модель настроек, JSON-хранилище
 │   │   ├── capture/                # интерфейсы захвата и координатор сценариев
 │   │   ├── storage/                # запись PNG, автосохранение
+│   │   ├── editor/                 # модель редактора: фрагменты, штрихи, история, масштаб, рендер итога (ADR-006)
 │   │   ├── platform/windows/       # реализации на WinAPI
 │   │   │   └── jna/                # JNA-интерфейсы, структуры, константы
-│   │   └── ui/                     # трей, уведомление, оверлей, окно настроек, «Сохранить как»
+│   │   └── ui/                     # трей, уведомление, оверлей, окно настроек, «Сохранить как», окно редактора
 │   ├── main/resources/logback.xml
 │   └── test/kotlin/by/sparkyanvil/fastcowscreenshot/   # зеркально main
 └── docs/
@@ -71,8 +72,9 @@ fast-cow-screenshot/
 |---|---|---|---|
 | `…fastcowscreenshot.domain` | Геометрия, имена файлов, значения | только JDK (`java.time`, `java.nio.file`) | `java.awt.*` (кроме `java.awt.image.BufferedImage`), `javax.swing`, `com.sun.jna`, `androidx.compose` |
 | `…fastcowscreenshot.settings` | `AppSettings`, `HotkeyBinding`, хранилище JSON | `domain`, kotlinx.serialization | `platform`, `ui`, `com.sun.jna` |
-| `…fastcowscreenshot.capture` | Интерфейсы (`ScreenCapturer`, `ClipboardWriter`…), `CaptureCoordinator` | `domain`, `settings`, `storage` (интерфейсы) | `platform`, `ui`, `com.sun.jna`, `javax.swing` |
+| `…fastcowscreenshot.capture` | Интерфейсы (`ScreenCapturer`, `ClipboardWriter`, `ScreenshotEditor`…), `CaptureCoordinator` | `domain`, `settings`, `storage` (интерфейсы), `editor` | `platform`, `ui`, `com.sun.jna`, `javax.swing` |
 | `…fastcowscreenshot.storage` | Запись PNG, автосохранение | `domain`, `javax.imageio` | `platform`, `ui`, `com.sun.jna` |
+| `…fastcowscreenshot.editor` | Модель редактора: `FragmentLayout`, `Stroke`, `EditorState` (история), `EditorSnapshot`, `EditorRenderer`, `Viewport` | `domain`, `java.awt.image`, `java.awt.Graphics2D`/`BasicStroke`/`Color`/`RenderingHints`, `java.awt.geom` | `settings`, `capture`, `platform`, `ui`, `com.sun.jna`, `javax.swing`, `androidx.compose`, `org.jetbrains.skia` |
 | `…fastcowscreenshot.platform.windows` (+ `.jna`) | Реализации интерфейсов на WinAPI | `domain`, `capture`, `settings`, JNA | `ui` |
 | `…fastcowscreenshot.ui` | Окна, трей, диалоги | все пакеты выше, Compose, Swing/AWT | — |
 | `…fastcowscreenshot.app` | Сборка графа объектов, потоки, выход | все | — |
@@ -81,6 +83,8 @@ fast-cow-screenshot/
 - Любой вызов `com.sun.jna.*` — только в `platform.windows` и `platform.windows.jna`. Исключение — `ui` получает HWND окна
   через `WindowHandles` из `platform.windows` (TASK-005).
 - Классы `capture` и `storage` тестируются без Windows — все нативные зависимости у них только через интерфейсы.
+- `org.jetbrains.skia.*` (Skia из Compose Desktop) — только в `ui`, и только там, где это указано задачей
+  (`EditorImages`, ADR-006).
 
 ## 4. Сборка и команды (Windows PowerShell)
 
@@ -124,8 +128,8 @@ fast-cow-screenshot/
 
 | Вид работы | Где выполняется | Как переключаться |
 |---|---|---|
-| UI (трей, уведомление, оверлей, окно настроек) | AWT EDT | `SwingUtilities.invokeLater { }`; в коде — через `AppThreads.ui` (Executor) |
-| Перечисление мониторов, захват, указатель, буфер обмена | поток `fcs-capture` (однопоточный, контекст DPI Per-Monitor V2) | `AppThreads.capture.execute { }` |
+| UI (трей, уведомление, оверлей, окно настроек, окно редактора) | AWT EDT | `SwingUtilities.invokeLater { }`; в коде — через `AppThreads.ui` (Executor) |
+| Перечисление мониторов, захват, указатель, буфер обмена, рендер итога редактора (`EditorRenderer`) | поток `fcs-capture` (однопоточный, контекст DPI Per-Monitor V2) | `AppThreads.capture.execute { }` |
 | Кодирование PNG и запись файлов | поток `fcs-save` (однопоточный) | `AppThreads.save.execute { }` |
 | Нативные диалоги (сохранение, выбор папки, MessageBox), «Показать в папке» | поток `fcs-dialog` (однопоточный, COM STA) | `AppThreads.dialog.execute { }` |
 | Горячие клавиши, окно-владелец буфера | поток `fcs-hotkeys` (цикл `GetMessageW`) | `NativeMessageLoop.invoke { }` |
@@ -178,8 +182,8 @@ fast-cow-screenshot/
 - Имена тестов — в обратных кавычках, на английском: `` fun `returns primary monitor when cursor is outside`() ``.
 - Временные файлы — `@TempDir lateinit var tempDir: Path` (`org.junit.jupiter.api.io.TempDir`). Это **единственное**
   разрешённое использование `lateinit`.
-- Unit-тестами покрываются: `domain`, `settings`, `storage`, `capture` (с фейками), чистые функции `platform`
-  (`DibEncoder`, `HotkeyBinding`).
+- Unit-тестами покрываются: `domain`, `settings`, `storage`, `capture` (с фейками), `editor`, чистые функции `platform`
+  (`DibEncoder`, `HotkeyBinding`) и чистые классы `ui` (`EditorController`, `EditorKeymap`, `SettingsController`).
 - MockK на JDK 25: агент ByteBuddy подключается к тестовой JVM через `-javaagent:<byte-buddy-agent.jar>` и
   `-Xshare:off` в `doFirst` блока `tasks.test` `build.gradle.kts` (TASK-004, CLR-001, CLR-002). Self-attach
   (`-Djdk.attach.allowAttachSelf=true`) не использовать: он ломается на путях с кириллицей. В `appJvmArgs` эти
@@ -198,6 +202,16 @@ fast-cow-screenshot/
   `SettingsWindow.WIDTH − 16`. Кнопки внутри ячеек — фиксированной ширины с `maxLines = 1` у текста. Строки одного
   раздела используют одни и те же столбцы (TASK-030).
 - Тесты с реальным WinAPI помечаются `@EnabledOnOs(OS.WINDOWS)` и не требуют действий пользователя.
+- Окно редактора (Compose, ADR-006):
+  - логика окна — в `ui.EditorController` (без Compose, тестируется unit-тестами); composable-функции только рисуют
+    состояние контроллера и передают ему события;
+  - обработчики кнопок и клавиш вызывают контроллер **отложенно** — `SwingUtilities.invokeLater { controller.… }`:
+    действие может открыть модальный `JOptionPane` или закрыть окно, а делать это внутри обработки события Compose
+    нельзя. События указателя и колеса (`onPointerEvent`) вызывают контроллер напрямую;
+  - `Modifier.onPointerEvent` требует `@OptIn(ExperimentalComposeUiApi::class)` — это разрешённое использование
+    экспериментального API;
+  - имя `Stroke` занято классом `editor.Stroke`; Compose-стиль импортировать с псевдонимом:
+    `import androidx.compose.ui.graphics.drawscope.Stroke as DrawStroke`.
 - Реальный захват на нескольких мониторах, HiDPI, горячие клавиши, трей и вставку из буфера проверяет пользователь
   по шагам раздела «Проверка» задачи.
 
@@ -232,3 +246,4 @@ fast-cow-screenshot/
 | 2026-10-31 | §1, §4: процесс релиза, версия в `gradle.properties`; exe дистрибутива — `FastCScreen.exe` | ADR-004, TASK-020 – TASK-022 |
 | 2026-11-08 | §9: `NumPad Enter` в Compose/AWT; разделение `HotkeyBinding` и `OverlayKey` | ADR-005, TDD-003 |
 | 2026-11-08 | §9: правило сеточной раскладки строк окна настроек | TASK-028 (замечание пользователя), TASK-030 |
+| 2026-11-15 | §2, §3: пакет `editor`; `capture` может зависеть от `editor`; Skia — только в `ui`. §6: рендер итога редактора на `fcs-capture`. §9: правила окна редактора | ADR-006, TDD-004 |

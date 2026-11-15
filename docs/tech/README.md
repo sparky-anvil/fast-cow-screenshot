@@ -29,6 +29,7 @@
 | [TDD-001](designs/TDD-001-screen-capture-v1.md) | Захват экрана (3 режима), буфер, автосохранение, «Сохранить как», настройки — v1 Windows | REQ-001, US-001 – US-007, RES-001 | Review |
 | [TDD-002](designs/TDD-002-release-process.md) | Процесс релиза и выпуск версии 0.0.1 | ADR-004, запрос пользователя | Review |
 | [TDD-003](designs/TDD-003-multi-region-capture.md) | Режим «Несколько областей»: выделение регионов и склейка | REQ-002, US-008 – US-010, ADR-005 | Approved |
+| [TDD-004](designs/TDD-004-screenshot-editor.md) | Редактор снимков: карандаш, перемещение и склейка фрагментов, масштаб | REQ-003, US-011 – US-014, ADR-006 | Approved |
 
 ## Задачи
 
@@ -66,6 +67,16 @@
 | [TASK-028](tasks/TASK-028-multi-region-settings-ui.md) | Раздел настроек «Несколько областей» | TDD-003 | 027 | L | Review |
 | [TASK-029](tasks/TASK-029-multi-region-acceptance.md) | Приёмка и замеры NFR режима | TDD-003 | 030 | S | Review |
 | [TASK-030](tasks/TASK-030-multi-region-settings-grid-layout.md) | Раскладка раздела «Несколько областей» таблицей (замечание к TASK-028) | TDD-003 | 028 | S | Review |
+| [TASK-031](tasks/TASK-031-editor-settings.md) | Настройки редактора и флажок в окне настроек | TDD-004 | — | M | Ready |
+| [TASK-032](tasks/TASK-032-editor-geometry.md) | Штрихи, инструменты, геометрия фрагментов `FragmentLayout` | TDD-004 | — | M | Ready |
+| [TASK-033](tasks/TASK-033-editor-snapshot-renderer.md) | `EditorSnapshot` и рендер итога `EditorRenderer` | TDD-004 | 032 | M | Ready |
+| [TASK-034](tasks/TASK-034-editor-state-history.md) | Состояние редактора и история `EditorState` | TDD-004 | 032, 033 | L | Ready |
+| [TASK-035](tasks/TASK-035-viewport-and-keymap.md) | `Viewport` и клавиши `EditorKeymap` | TDD-004 | — | M | Ready |
+| [TASK-036](tasks/TASK-036-coordinator-editor-integration.md) | Встраивание редактора в `CaptureCoordinator`, `SaveAsAction.runFor` | TDD-004 | 031, 033 | L | Ready |
+| [TASK-037](tasks/TASK-037-editor-controller.md) | Логика окна `EditorController` | TDD-004 | 034, 035, 036 | L | Ready |
+| [TASK-038](tasks/TASK-038-editor-window.md) | Окно `EditorWindow`: панель, холст, клавиши, завершение, подключение | TDD-004 | 037 | L | Ready |
+| [TASK-039](tasks/TASK-039-editor-canvas-mouse.md) | Мышь на холсте: карандаш, перетаскивание, подсветка, курсоры | TDD-004 | 038 | M | Ready |
+| [TASK-040](tasks/TASK-040-editor-acceptance.md) | Приёмка редактора и замеры NFR | TDD-004 | 039 | S | Ready |
 
 ## Порядок выполнения
 
@@ -78,6 +89,9 @@ TASK-002/003/005 и TASK-011/012/013 между собой независимы.
 в `main` (предусловия TASK-022).
 
 Несколько областей (TDD-003): TASK-023 и TASK-024 независимы; затем 024 → 025 → 026; 023 + 026 → 027 → 028 → 030 → 029.
+
+Редактор (TDD-004): TASK-031, TASK-032, TASK-035 независимы; 032 → 033 → 034; 031 + 033 → 036; 034 + 035 + 036 → 037
+→ 038 → 039 → 040. Рекомендуемый линейный порядок: 031 → 032 → 033 → 034 → 035 → 036 → 037 → 038 → 039 → 040.
 
 ## Запросы уточнения
 

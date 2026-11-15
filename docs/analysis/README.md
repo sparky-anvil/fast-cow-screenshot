@@ -22,7 +22,7 @@
 |---|---|---|---|
 | [REQ-001](requirements/REQ-001-screen-capture-clipboard-save.md) | Захват экрана с учётом мультимонитора, автокопирование в буфер и сохранение файлов | Must | Review |
 | [REQ-002](requirements/REQ-002-multi-region-capture.md) | Режим «Несколько областей»: выделение нескольких регионов и склейка в одно изображение | Should | Approved |
-| [REQ-003](requirements/REQ-003-screenshot-editor.md) | Редактор снимков: рисование карандашом, перемещение и склейка областей | Should | Draft |
+| [REQ-003](requirements/REQ-003-screenshot-editor.md) | Редактор снимков: рисование карандашом, перемещение и склейка областей | Should | Approved |
 
 ## User stories
 
@@ -52,6 +52,7 @@
 | [ADR-003](decisions/ADR-003-settings-logging-tests.md) | Настройки JSON в %APPDATA%, SLF4J + Logback, JUnit 6 + MockK | Accepted |
 | [ADR-004](decisions/ADR-004-release-process.md) | Релиз: net.researchgate.release, ZIP app-image, GitHub Actions по тегу | Accepted |
 | [ADR-005](decisions/ADR-005-multi-region-overlay-keys-and-stitching.md) | Режим «Несколько областей»: локальные клавиши оверлея, склейка сжатием координат, палитра цвета | Accepted |
+| [ADR-006](decisions/ADR-006-screenshot-editor-architecture.md) | Редактор снимков: Compose Canvas (Skia), модель с историей в пакете `editor`, итог — рендер Java2D | Accepted |
 
 ## Исследования
 
