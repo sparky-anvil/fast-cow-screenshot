@@ -2,7 +2,7 @@
 
 | Поле | Значение |
 |---|---|
-| Статус | Ready |
+| Статус | Review |
 | Приоритет | Must |
 | Оценка | M (1–3 ч) |
 | Технический дизайн | TDD-004 §4, §5, §8 |
@@ -272,10 +272,10 @@ fragmentAt(rects, point):
 
 ## 13. Критерии готовности (Definition of Done)
 
-- [ ] Сигнатуры совпадают с разделом 6.
-- [ ] Тесты 1–18 написаны и проходят.
-- [ ] В пакете `editor` нет импортов `androidx.compose`, `javax.swing`, `com.sun.jna`, `…settings`, `…capture`, `…ui`.
-- [ ] Выполнен общий DoD из `docs/tech/conventions.md`.
+- [x] Сигнатуры совпадают с разделом 6.
+- [x] Тесты 1–18 написаны и проходят.
+- [x] В пакете `editor` нет импортов `androidx.compose`, `javax.swing`, `com.sun.jna`, `…settings`, `…capture`, `…ui`.
+- [x] Выполнен общий DoD из `docs/tech/conventions.md`.
 
 ## 14. Чего НЕ делать
 
@@ -295,4 +295,4 @@ fragmentAt(rects, point):
 
 | Дата | Статус | Что сделано / отклонения от задачи / проблемы |
 |---|---|---|
-| | | |
+| 2026-11-15 | Review | Реализованы шаги 1–3, тесты 1–18. `gradlew build` — BUILD SUCCESSFUL. Импорты пакета editor: только domain. Отклонений нет. |

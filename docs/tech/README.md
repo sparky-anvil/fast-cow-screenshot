@@ -67,8 +67,8 @@
 | [TASK-028](tasks/TASK-028-multi-region-settings-ui.md) | Раздел настроек «Несколько областей» | TDD-003 | 027 | L | Review |
 | [TASK-029](tasks/TASK-029-multi-region-acceptance.md) | Приёмка и замеры NFR режима | TDD-003 | 030 | S | Review |
 | [TASK-030](tasks/TASK-030-multi-region-settings-grid-layout.md) | Раскладка раздела «Несколько областей» таблицей (замечание к TASK-028) | TDD-003 | 028 | S | Review |
-| [TASK-031](tasks/TASK-031-editor-settings.md) | Настройки редактора и флажок в окне настроек | TDD-004 | — | M | Review |
-| [TASK-032](tasks/TASK-032-editor-geometry.md) | Штрихи, инструменты, геометрия фрагментов `FragmentLayout` | TDD-004 | — | M | Ready |
+| [TASK-031](tasks/TASK-031-editor-settings.md) | Настройки редактора и флажок в окне настроек | TDD-004 | — | M | Done |
+| [TASK-032](tasks/TASK-032-editor-geometry.md) | Штрихи, инструменты, геометрия фрагментов `FragmentLayout` | TDD-004 | — | M | Review |
 | [TASK-033](tasks/TASK-033-editor-snapshot-renderer.md) | `EditorSnapshot` и рендер итога `EditorRenderer` | TDD-004 | 032 | M | Ready |
 | [TASK-034](tasks/TASK-034-editor-state-history.md) | Состояние редактора и история `EditorState` | TDD-004 | 032, 033 | L | Ready |
 | [TASK-035](tasks/TASK-035-viewport-and-keymap.md) | `Viewport` и клавиши `EditorKeymap` | TDD-004 | — | M | Ready |
