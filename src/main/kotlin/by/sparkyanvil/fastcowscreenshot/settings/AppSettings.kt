@@ -12,6 +12,8 @@ internal data class AppSettings(
     val autoSaveEnabled: Boolean = true,
     val hotkeys: HotkeySettings = HotkeySettings(),
     val multiRegion: MultiRegionSettings = MultiRegionSettings(),
+    val openInEditor: Boolean = false, // REQ-003.1
+    val editor: EditorSettings = EditorSettings(), // REQ-003.19
 ) {
     /** HotkeyBinding.parse(hotkeys.get(action)) ?: HotkeyBinding.defaultFor(action). */
     fun hotkeyBinding(action: HotkeyAction): HotkeyBinding =

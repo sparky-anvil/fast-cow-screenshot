@@ -74,6 +74,37 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun `old file without editor fields gives defaults`() {
+        Files.createDirectories(file.parent)
+        Files.writeString(
+            file,
+            """
+            {
+              "version": 1,
+              "defaultDirectory": "D:\\Shots",
+              "lastSaveAsDirectory": "E:\\Out",
+              "includeCursor": true,
+              "autoSaveEnabled": false,
+              "hotkeys": {"monitorUnderCursor": "Ctrl+Alt+1", "allMonitors": "Ctrl+Shift+2", "region": "Ctrl+Shift+3"},
+              "extra": 5
+            }
+            """.trimIndent(),
+            UTF_8,
+        )
+        val loaded = SettingsRepository(file, provider).load()
+        assertFalse(loaded.openInEditor)
+        assertEquals(EditorSettings(), loaded.editor)
+    }
+
+    @Test
+    fun `editor settings round trip`() {
+        val repo = SettingsRepository(file, provider)
+        val saved = repo.defaultSettings().copy(openInEditor = true, editor = EditorSettings("#FFD800", 2))
+        repo.save(saved)
+        assertEquals(saved, repo.load())
+    }
+
+    @Test
     fun `missing directory on disk is not reset`() {
         val repo = SettingsRepository(file, provider)
         repo.save(repo.defaultSettings().copy(defaultDirectory = "Z:\\offline"))

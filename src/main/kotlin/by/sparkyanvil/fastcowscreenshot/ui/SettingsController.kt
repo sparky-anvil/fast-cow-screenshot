@@ -91,6 +91,10 @@ internal class SettingsController(
     fun setAutoSave(value: Boolean): String? =
         if (store.update { it.copy(autoSaveEnabled = value) }) null else ERR_SAVE
 
+    /** Флажок «Открывать снимок в редакторе» (REQ-003.1). Ошибка (ERR_SAVE) или null. */
+    fun setOpenInEditor(value: Boolean): String? =
+        if (store.update { it.copy(openInEditor = value) }) null else ERR_SAVE
+
     /**
      * Назначает клавишу оверлея. key == null — очистить слот (только SECONDARY).
      * @return null — успех; ERR_PRIMARY_REQUIRED; ERR_OVERLAY_DUPLICATE_FORMAT; ERR_SAVE.

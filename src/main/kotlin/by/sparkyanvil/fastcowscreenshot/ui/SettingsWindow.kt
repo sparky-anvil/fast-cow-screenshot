@@ -206,6 +206,10 @@ internal fun SettingsContent(
                     Text("Включать указатель мыши в снимок")
                 }
                 Row {
+                    Checkbox(checked = s.openInEditor, onCheckedChange = { generalError = controller.setOpenInEditor(it) })
+                    Text("Открывать снимок в редакторе")
+                }
+                Row {
                     Checkbox(checked = s.autoSaveEnabled, onCheckedChange = { generalError = controller.setAutoSave(it) })
                     Text("Автоматически сохранять снимки в директорию по умолчанию")
                 }

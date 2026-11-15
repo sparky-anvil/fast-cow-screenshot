@@ -21,6 +21,7 @@ import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import java.util.concurrent.Executor
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -128,6 +129,15 @@ class SettingsControllerTest {
         val loaded = SettingsRepository(tempDir.resolve("settings.json"), defaults).load()
         assertTrue(loaded.includeCursor)
         assertEquals(false, loaded.autoSaveEnabled)
+    }
+
+    @Test
+    fun `set open in editor saves flag`() {
+        val c = controller()
+        assertNull(c.setOpenInEditor(true))
+        assertTrue(store.current.openInEditor)
+        assertNull(c.setOpenInEditor(false))
+        assertFalse(store.current.openInEditor)
     }
 
     @Test
